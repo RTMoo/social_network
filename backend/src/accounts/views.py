@@ -3,9 +3,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
-
-from accounts.serializers import UserRegistrationSerializer, UserConfirmCodeSerializer
 from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
+from accounts.serializers import UserRegistrationSerializer, UserConfirmCodeSerializer
 from accounts.utils import set_jwt_token
 from accounts.models import CustomUser
 from django.core.cache import cache
