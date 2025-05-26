@@ -15,7 +15,7 @@ class UserRegistrationSerializer(ModelSerializer):
     """
 
     email = EmailField(required=True)
-    username = CharField()
+    username = CharField(required=True)
     password = CharField(write_only=True)
 
     class Meta:
