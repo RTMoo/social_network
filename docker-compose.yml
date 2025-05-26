@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./src/Dockerfile
+    env_file:
+      - backend/.env
+    volumes:
+      - ./backend/src:/src
+      - ./backend/pyproject.toml:/pyproject.toml
+      - ./backend/uv.lock:/uv.lock
+    environment:
+      - REDIS_HOST=redis
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    command: ["uv", "run", "manage.py", "runserver", "0.0.0.0:8000"]
+
+  celery:
+    build:
+      context: ./backend
+      dockerfile: ./src/Dockerfile
+    command: ["uv", "run", "celery", "-A", "config", "worker", "--loglevel=info"]
+    env_file:
+      - backend/.env
+    volumes:
+      - ./backend/src:/src
+      - ./backend/pyproject.toml:/pyproject.toml
+      - ./backend/uv.lock:/uv.lock
+    environment:
+      - REDIS_HOST=redis
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - backend
+      - redis
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
