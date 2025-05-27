@@ -29,7 +29,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
-    username = models.CharField(max_length=64, unique=True)
+    username = models.CharField(max_length=32, unique=True)
     email = models.EmailField(unique=True)
 
     first_name = None
