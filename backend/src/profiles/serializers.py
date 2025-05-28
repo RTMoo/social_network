@@ -3,7 +3,6 @@ from profiles.validators import validate_min_length_if_not_empty
 
 
 class ProfileSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
     first_name = serializers.CharField(max_length=32, allow_blank=True, required=False)
     last_name = serializers.CharField(max_length=32, allow_blank=True, required=False)
     avatar = serializers.ImageField(allow_null=True, required=False)
