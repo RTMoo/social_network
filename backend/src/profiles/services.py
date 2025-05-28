@@ -3,6 +3,11 @@ from rest_framework.request import Request
 from rest_framework.exceptions import PermissionDenied
 from profiles.selectors import get_profile
 from profiles.models import Profile
+from accounts.models import CustomUser
+
+
+def create_profile(user: CustomUser) -> None:
+    Profile.objects.create(user=user)
 
 
 def update_profile(request: Request, username: str, data: dict[str, Any]) -> Profile:
