@@ -7,13 +7,13 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenBlacklistView,
 )
-from accounts.serializers import UserRegistrationSerializer, UserConfirmCodeSerializer
+from accounts.serializers import RegistrationSerializer, ConfirmCodeSerializer
 from accounts.utils import set_jwt_token
 from accounts.models import CustomUser
 from accounts.services import register_user, confirm_code
 
 
-class CustomTokenObtainPairView(TokenObtainPairView):
+class LoginView(TokenObtainPairView):
     """
     Хранение токена в HttpOnly
     """
@@ -102,9 +102,9 @@ class CustomTokenBlacklistView(TokenBlacklistView):
         return response
 
 
-class UserRegistrationAPIView(APIView):
+class RegistrationView(APIView):
     permission_classes = [AllowAny]
-    serializer_class = UserRegistrationSerializer
+    serializer_class = RegistrationSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -115,8 +115,8 @@ class UserRegistrationAPIView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class UserConfirmCode(APIView):
-    serializer_class = UserConfirmCodeSerializer
+class ConfirmCodeView(APIView):
+    serializer_class = ConfirmCodeSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)

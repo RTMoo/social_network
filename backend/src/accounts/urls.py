@@ -1,16 +1,16 @@
 from django.urls import path
 from accounts.views import (
-    CustomTokenObtainPairView,
-    UserRegistrationAPIView,
+    LoginView,
+    RegistrationView,
     CustomTokenRefreshView,
     CustomTokenBlacklistView,
-    UserConfirmCode,
+    ConfirmCodeView,
 )
 
 urlpatterns = [
-    path("register/", UserRegistrationAPIView.as_view(), name="register"),
-    path("login/", CustomTokenObtainPairView.as_view(), name="login"),
+    path("register/", RegistrationView.as_view(), name="register"),
+    path("login/", LoginView.as_view(), name="login"),
     path("refresh/", CustomTokenRefreshView.as_view(), name="token_refresh"),
     path("logout/", CustomTokenBlacklistView.as_view(), name="logout"),
-    path("confirm_code/", UserConfirmCode.as_view(), name="confirm_code"),
+    path("confirm_code/", ConfirmCodeView.as_view(), name="confirm_code"),
 ]
