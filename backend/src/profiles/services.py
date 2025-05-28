@@ -1,9 +1,15 @@
 from typing import Any
+from rest_framework.request import Request
+from rest_framework.exceptions import PermissionDenied
 from profiles.selectors import get_profile
+from profiles.models import Profile
 
 
-def update_profile(username: str, data: dict[str, Any]):
+def update_profile(request: Request, username: str, data: dict[str, Any]) -> Profile:
     profile = get_profile(username)
+
+    if request.user.username != username:
+        raise PermissionDenied(detail="Вы не можете изменить чужой профиль.")
 
     for key, value in data.items():
         setattr(profile, key, value)

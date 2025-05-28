@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework import status
 from profiles.serializers import ProfileSerializer
@@ -23,12 +23,12 @@ def get_profile_view(request: Request, username: str):
     responses=ProfileSerializer,
 )
 @api_view(["PATCH"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def update_profile_view(request: Request, username: str):
     serializer = ProfileSerializer(data=request.data, partial=True)
     serializer.is_valid(raise_exception=True)
 
-    updated_profile = update_profile(username, serializer.validated_data)
+    updated_profile = update_profile(request, username, serializer.validated_data)
     data = ProfileSerializer(instance=updated_profile).data
 
     return Response(data=data, status=status.HTTP_200_OK)
