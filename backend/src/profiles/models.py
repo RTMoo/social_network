@@ -2,6 +2,7 @@ from django.db import models
 from profiles.validators import validate_min_length_if_not_empty
 from profiles.utils import upload_to
 
+
 class Profile(models.Model):
     user = models.OneToOneField(to="accounts.CustomUser", on_delete=models.CASCADE)
     first_name = models.CharField(max_length=32, blank=True, default="")
@@ -20,7 +21,8 @@ class Profile(models.Model):
             field_name="last_name", value=self.last_name, is_model_exception=True
         )
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
         self.full_clean()
         return super().save(force_insert, force_update, using, update_fields)
-

@@ -2,12 +2,15 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenBlacklistView,
+)
 from accounts.serializers import UserRegistrationSerializer, UserConfirmCodeSerializer
 from accounts.utils import set_jwt_token
 from accounts.models import CustomUser
-from django.core.cache import cache
+from accounts.services import register_user, confirm_code
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -105,11 +108,11 @@ class UserRegistrationAPIView(APIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer.is_valid(raise_exception=True)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        register_user(serializer.validated_data)
+
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class UserConfirmCode(APIView):
@@ -119,31 +122,6 @@ class UserConfirmCode(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        email = serializer.validated_data["email"]
-        code = serializer.validated_data["code"]
+        confirm_code(serializer.validated_data)
 
-        real_code = cache.get(email)
-
-        if real_code is None:
-            return Response(
-                {"detail": "Код истёк или не запрашивался"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if code != real_code:
-            return Response(
-                {"detail": "Неверный код"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        user = CustomUser.objects.filter(email=email).first()
-
-        if not user:
-            return Response(
-                {"detail": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        user.is_active = True
-        user.save()
-
-        cache.delete(email)
         return Response(status=status.HTTP_200_OK)
