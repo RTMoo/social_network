@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "accounts",
     "profiles",
+    "django_countries",
 ]
 
 MIDDLEWARE = [

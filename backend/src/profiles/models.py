@@ -1,5 +1,6 @@
 from django.db import models
 from profiles.validators import validate_min_length_if_not_empty
+from django_countries.fields import CountryField
 
 
 class Profile(models.Model):
@@ -9,7 +10,7 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to="profiles/avatars", blank=True, null=True)
     bio = models.TextField(max_length=512, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
-    country = models.CharField(max_length=2, blank=True, null=True)
+    country = CountryField(blank=True, null=True)
 
     def clean(self):
         validate_min_length_if_not_empty(

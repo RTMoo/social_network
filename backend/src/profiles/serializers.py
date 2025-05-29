@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from profiles.validators import validate_min_length_if_not_empty
+from django_countries.serializer_fields import CountryField
 
 
 class ProfileSerializer(serializers.Serializer):
@@ -8,7 +9,7 @@ class ProfileSerializer(serializers.Serializer):
     avatar = serializers.ImageField(allow_null=True, required=False)
     bio = serializers.CharField(max_length=512, allow_blank=True, required=False)
     birth_date = serializers.DateField(allow_null=True, required=False)
-    country = serializers.CharField(max_length=2, allow_blank=True, required=False)
+    country = CountryField(country_dict=True)
 
     def validate_first_name(self, value):
         validate_min_length_if_not_empty("first_name", value)
