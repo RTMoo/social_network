@@ -34,5 +34,5 @@ def make_circle_avatar(input_path, size=(400, 400)):
 
     # Сохраняем в байты
     byte_io = BytesIO()
-    result.save(byte_io, format='PNG')
+    result.save(byte_io, format="PNG")
     return ContentFile(byte_io.getvalue())

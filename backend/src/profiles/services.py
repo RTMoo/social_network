@@ -29,4 +29,3 @@ def update_profile(request: Request, username: str, data: dict[str, Any]) -> Pro
 
     profile.save()
     return profile
-
