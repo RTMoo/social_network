@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "accounts",
     "profiles",
+    "posts",
     "django_countries",
 ]
 
