@@ -24,11 +24,11 @@ def get_profile_view(request: Request, username: str):
 )
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticatedOrReadOnly])
-def update_profile_view(request: Request, username: str):
+def update_profile_view(request: Request):
     serializer = ProfileSerializer(data=request.data, partial=True)
     serializer.is_valid(raise_exception=True)
 
-    updated_profile = update_profile(request, username, serializer.validated_data)
+    updated_profile = update_profile(request, serializer.validated_data)
     data = ProfileSerializer(instance=updated_profile).data
 
     return Response(data=data, status=status.HTTP_200_OK)
