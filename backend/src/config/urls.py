@@ -4,6 +4,7 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from django.conf import settings
 
 urlpatterns = [
     path("api/accounts/", include("accounts.urls")),
@@ -19,3 +20,6 @@ urlpatterns = [
         "api/docs/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"
     ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
