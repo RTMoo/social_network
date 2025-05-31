@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 from posts.serializers import PostSerializer
 from posts.services import create_post
+from posts.selectors import get_user_posts
 
 
 @extend_schema(
@@ -22,3 +23,16 @@ def create_post_view(request: Request):
     data = PostSerializer(instance=created_post).data
 
     return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(
+    responses=PostSerializer,
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_user_posts_view(request: Request, username: str):
+    posts = get_user_posts(username=username)
+
+    data = PostSerializer(instance=posts, many=True).data
+
+    return Response(data=data, status=status.HTTP_200_OK)
