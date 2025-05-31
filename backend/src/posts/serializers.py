@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 
 class PostSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     author = serializers.CharField(source="author.username", read_only=True)
     title = serializers.CharField(max_length=128)
     content = serializers.CharField(max_length=2000)
