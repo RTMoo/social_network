@@ -5,7 +5,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 from posts.serializers import PostSerializer
-from posts.services import create_post
+from posts.services import create_post, update_post
 from posts.selectors import get_user_posts, get_post
 
 
@@ -47,5 +47,19 @@ def get_post_view(request: Request, post_id: int):
     post = get_post(post_id=post_id)
 
     data = PostSerializer(instance=post).data
+
+    return Response(data=data, status=status.HTTP_200_OK)
+
+
+@extend_schema(responses=PostSerializer, request=PostSerializer)
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def update_post_view(request: Request, post_id: int):
+    serializer = PostSerializer(data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+
+    updated_post = update_post(data=serializer.validated_data, post_id=post_id)
+
+    data = PostSerializer(instance=updated_post).data
 
     return Response(data=data, status=status.HTTP_200_OK)
