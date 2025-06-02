@@ -72,5 +72,5 @@ def update_post_view(request: Request, post_id: int):
 @permission_classes([IsAuthenticated])
 def delete_post_view(request: Request, post_id: int):
     delete_post(post_id=post_id, author=request.user)
-    
+
     return Response(status=status.HTTP_204_NO_CONTENT)

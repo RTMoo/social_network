@@ -24,8 +24,8 @@ def update_post(data: dict[str, Any], post_id: int) -> Post:
 
 def delete_post(post_id: int, author: CustomUser) -> None:
     post = get_post(post_id)
-    
+
     if post.author != author:
         raise PermissionDenied()
-    
+
     post.delete()

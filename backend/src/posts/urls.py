@@ -4,7 +4,7 @@ from posts.views import (
     get_user_posts_view,
     get_post_view,
     update_post_view,
-    delete_post_view
+    delete_post_view,
 )
 
 
