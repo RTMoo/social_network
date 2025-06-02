@@ -5,7 +5,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 from posts.serializers import PostSerializer
-from posts.services import create_post, update_post
+from posts.services import create_post, update_post, delete_post
 from posts.selectors import get_user_posts, get_post
 
 
@@ -51,7 +51,10 @@ def get_post_view(request: Request, post_id: int):
     return Response(data=data, status=status.HTTP_200_OK)
 
 
-@extend_schema(responses=PostSerializer, request=PostSerializer)
+@extend_schema(
+    responses=PostSerializer,
+    request=PostSerializer,
+)
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
 def update_post_view(request: Request, post_id: int):
@@ -63,3 +66,11 @@ def update_post_view(request: Request, post_id: int):
     data = PostSerializer(instance=updated_post).data
 
     return Response(data=data, status=status.HTTP_200_OK)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_post_view(request: Request, post_id: int):
+    delete_post(post_id=post_id, author=request.user)
+    
+    return Response(status=status.HTTP_204_NO_CONTENT)

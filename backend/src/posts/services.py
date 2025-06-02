@@ -1,4 +1,5 @@
 from typing import Any
+from rest_framework.exceptions import PermissionDenied
 from posts.models import Post
 from accounts.models import CustomUser
 from posts.selectors import get_post
@@ -19,3 +20,12 @@ def update_post(data: dict[str, Any], post_id: int) -> Post:
     post.save()
 
     return post
+
+
+def delete_post(post_id: int, author: CustomUser) -> None:
+    post = get_post(post_id)
+    
+    if post.author != author:
+        raise PermissionDenied()
+    
+    post.delete()
