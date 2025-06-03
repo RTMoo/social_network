@@ -15,9 +15,9 @@ def create_comment(data: dict[str, Any], author: CustomUser) -> Comment:
         parent = get_comment(comment_id=parent_id)
 
         if parent.post_id != post.id:
-            raise ValidationError({
-                "parent_id": "Родительский комментарий не принадлежит данному посту."
-            })
+            raise ValidationError(
+                {"parent_id": "Родительский комментарий не принадлежит данному посту."}
+            )
 
     comment = Comment.objects.create(
         post=post,
