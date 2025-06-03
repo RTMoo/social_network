@@ -3,14 +3,16 @@ from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, username, password=None, **extra_fields):
+    def create_user(
+        self, email, username, is_active=False, password=None, **extra_fields
+    ):
         if not email:
             raise ValueError("Email обязателен")
         if not username:
             raise ValueError("Username обязателен")
 
         email = self.normalize_email(email)
-        extra_fields.setdefault("is_active", False)
+        extra_fields.setdefault("is_active", is_active)
 
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
