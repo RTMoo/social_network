@@ -16,7 +16,7 @@ def get_post_comments(post_id: int):
     Возвращает комментарии первого уровня
     """
 
-    return Comment.objects.filter(post_id=post_id, parent__isnull=True)
+    return Comment.objects.filter(post_id=post_id, parent__isnull=True).select_related("author")
 
 
 def get_comment_replies(comment_id: int):
@@ -24,4 +24,4 @@ def get_comment_replies(comment_id: int):
     Возвращает все ответы под родительским комментарием
     """
 
-    return Comment.objects.filter(parent_id=comment_id)
+    return Comment.objects.filter(parent_id=comment_id).select_related("author")

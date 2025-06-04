@@ -17,7 +17,7 @@ urlpatterns = [
         name="get_post_comments",
     ),
     path(
-        route="<int:comment_id>/",
+        route="replies/<int:comment_id>/",
         view=get_comment_replies_view,
         name="get_comment_replies",
     ),
