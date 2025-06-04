@@ -9,3 +9,19 @@ def get_comment(comment_id: int) -> Comment:
         raise NotFound()
 
     return comment
+
+
+def get_post_comments(post_id: int):
+    """
+    Возвращает комментарии первого уровня
+    """
+
+    return Comment.objects.filter(post_id=post_id, parent__isnull=True)
+
+
+def get_comment_replies(comment_id: int):
+    """
+    Возвращает все ответы под родительским комментарием
+    """
+
+    return Comment.objects.filter(parent_id=comment_id)

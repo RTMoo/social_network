@@ -4,6 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from comments.services import create_comment
+from comments.selectors import get_post_comments, get_comment_replies
 from comments.serializers import CommentSerializer
 from drf_spectacular.utils import extend_schema
 
@@ -23,3 +24,29 @@ def create_comment_view(request: Request):
     data = CommentSerializer(instance=created_comment).data
 
     return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+@extend_schema(
+    responses=CommentSerializer,
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_post_comments_view(request: Request, post_id: int):
+    comments = get_post_comments(post_id=post_id)
+
+    data = CommentSerializer(instance=comments, many=True).data
+
+    return Response(data=data, status=status.HTTP_200_OK)
+
+
+@extend_schema(
+    responses=CommentSerializer,
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_comment_replies_view(request: Request, comment_id: int):
+    replies = get_comment_replies(comment_id=comment_id)
+
+    data = CommentSerializer(instance=replies, many=True).data
+
+    return Response(data=data, status=status.HTTP_200_OK)
