@@ -33,7 +33,6 @@ class CreateCommentTestCase(APITestCase):
         url = reverse("create_comment")
         data = {
             "post_id": self.post.id,
-            "thread_id": None,  # thread
             "reply_to_id": None,
             "text": "Мой первый комментарий",
         }
@@ -56,13 +55,13 @@ class CreateCommentTestCase(APITestCase):
         url = reverse("create_comment")
         data = {
             "post_id": self.post.id,
-            "thread_id": first_comment.id,  # thread будет first_comment
-            "reply_to_id": first_comment.id,  # reply_to тоже first_comment
+            "reply_to_id": first_comment.id,
             "text": "Ответ на первый уровень",
         }
 
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        print(response.data)
 
         reply_comment = Comment.objects.get(id=response.data["id"])
         self.assertEqual(reply_comment.thread, first_comment)
@@ -86,7 +85,6 @@ class CreateCommentTestCase(APITestCase):
         url = reverse("create_comment")
         data = {
             "post_id": self.post.id,
-            "thread_id": first_comment.id,  # thread всегда верхний
             "reply_to_id": reply.id,  # отвечаем конкретно на reply
             "text": "Ответ на ответ",
         }
@@ -113,7 +111,6 @@ class CreateCommentTestCase(APITestCase):
         url = reverse("create_comment")
         data = {
             "post_id": another_post.id,
-            "thread_id": parent_comment.id,
             "reply_to_id": parent_comment.id,
             "text": "Неправильная связь",
         }
@@ -125,8 +122,7 @@ class CreateCommentTestCase(APITestCase):
         url = reverse("create_comment")
         data = {
             "post_id": self.post.id,
-            "thread_id": 9999,
-            "reply_to_id": None,
+            "reply_to_id": 9999,
             "text": "Ошибка",
         }
 
@@ -137,7 +133,6 @@ class CreateCommentTestCase(APITestCase):
         url = reverse("create_comment")
         data = {
             "post_id": self.post.id,
-            "thread_id": None,
             "reply_to_id": None,
             "text": None,
         }
@@ -150,7 +145,6 @@ class CreateCommentTestCase(APITestCase):
         url = reverse("create_comment")
         data = {
             "post_id": 9999,
-            "thread_id": None,
             "reply_to_id": None,
             "text": "Попытка",
         }
