@@ -10,7 +10,16 @@ from comments.services import update_comment
 
 class CreateCommentTestCase(APITestCase):
     """
-    Тесты для эндпоинта создания комментария с полями thread и reply_to
+    Тесты для эндпоинта создания комментария.
+
+    Проверяется логика создания:
+    - комментария первого уровня (без reply_to и thread),
+    - ответа на комментарий с корректным указанием reply_to,
+    - ответа на ответ (reply_to внутри ветки),
+    - валидации невозможности ответа на комментарий из другого поста,
+    - обработка несуществующего reply_to,
+    - проверка обязательного поля text,
+    - проверка несуществующего поста.
     """
 
     def setUp(self):
@@ -28,12 +37,14 @@ class CreateCommentTestCase(APITestCase):
 
     def test_create_comment_first_level(self):
         """
-        Создаем комментарий первого уровня (thread и reply_to должны быть None)
+        Создание комментария первого уровня.
+        Проверяем, что reply_to остаются None.
         """
+
         url = reverse("create_comment")
         data = {
             "post_id": self.post.id,
-            "reply_to_id": None,
+            "reply_to_id": None,  # или не передавать вовсе
             "text": "Мой первый комментарий",
         }
 
@@ -46,8 +57,11 @@ class CreateCommentTestCase(APITestCase):
 
     def test_create_reply_to_comment(self):
         """
-        Создаем первый уровень, потом ответ к нему с правильным thread и reply_to
+        Создание ответа на комментарий первого уровня.
+        Проверяем, что thread у нового комментария установлен в тот же, что у reply_to,
+        а reply_to указывает на коммент, на который отвечаем.
         """
+
         first_comment = Comment.objects.create(
             post=self.post, author=self.user, text="Первый уровень"
         )
@@ -69,8 +83,11 @@ class CreateCommentTestCase(APITestCase):
 
     def test_create_reply_to_reply(self):
         """
-        Создаем ответ к ответу. thread остается тот же, reply_to - конкретный ответ
+        Создание ответа на ответ.
+        Проверяем, что thread остается унаследованным от верхнего комментария,
+        а reply_to указывает на тот конкретный комментарий, на который ответ.
         """
+
         first_comment = Comment.objects.create(
             post=self.post, author=self.user, text="Первый уровень"
         )
@@ -98,8 +115,10 @@ class CreateCommentTestCase(APITestCase):
 
     def test_comment_to_comment_of_different_post(self):
         """
-        Пытаемся связать с тредом который нет в текущем посте
+        Пытаемся создать комментарий с reply_to, который принадлежит другому посту.
+        Ожидаем ошибку валидации (400 BAD REQUEST).
         """
+
         another_post = Post.objects.create(
             author=self.user, title="Another Post", content="Another"
         )
@@ -119,6 +138,11 @@ class CreateCommentTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_comment_to_nonexistent_parent(self):
+        """
+        Пытаемся создать комментарий с reply_to, которого не существует.
+        Ожидаем ошибку 404 NOT FOUND.
+        """
+
         url = reverse("create_comment")
         data = {
             "post_id": self.post.id,
@@ -130,6 +154,11 @@ class CreateCommentTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_comment_with_empty_text(self):
+        """
+        Пытаемся создать комментарий с пустым текстом.
+        Ожидаем ошибку валидации (400 BAD REQUEST), поле text обязательно.
+        """
+
         url = reverse("create_comment")
         data = {
             "post_id": self.post.id,
@@ -142,6 +171,11 @@ class CreateCommentTestCase(APITestCase):
         self.assertIn("text", response.data)
 
     def test_comment_to_nonexistent_post(self):
+        """
+        Пытаемся создать комментарий к несуществующему посту.
+        Ожидаем ошибку 404 NOT FOUND.
+        """
+
         url = reverse("create_comment")
         data = {
             "post_id": 9999,
@@ -154,6 +188,17 @@ class CreateCommentTestCase(APITestCase):
 
 
 class UpdateCommentTestCase(APITestCase):
+    """
+    Тесты для функции обновления комментария.
+
+    Проверяется:
+    - успешное обновление текста,
+    - успешное обновление поля reply_to,
+    - запрет смены reply_to на комментарий из другого поста,
+    - запрет сброса reply_to в None у комментариев с thread (ответы),
+    - запрет обновления комментария неавтором.
+    """
+
     def setUp(self):
         self.user = CustomUser.objects.create_user(
             email="test@example.com", username="user", password="pass", is_active=True
@@ -182,11 +227,19 @@ class UpdateCommentTestCase(APITestCase):
         )
 
     def test_update_text_success(self):
+        """
+        Успешное обновление текста комментария автором.
+        """
+
         data = {"text": "Обновленный текст"}
         updated = update_comment(data, comment_id=self.comment.id, sender=self.user)
         self.assertEqual(updated.text, "Обновленный текст")
 
     def test_update_reply_to_success(self):
+        """
+        Успешное обновление поля reply_to у комментария.
+        """
+
         data = {"reply_to_id": self.comment.id}
         updated = update_comment(
             data, comment_id=self.reply_comment.id, sender=self.user
@@ -194,6 +247,11 @@ class UpdateCommentTestCase(APITestCase):
         self.assertEqual(updated.reply_to, self.comment)
 
     def test_update_reply_to_invalid_post(self):
+        """
+        Попытка изменить reply_to на комментарий из другого поста.
+        Ожидаем ValidationError.
+        """
+
         another_comment = Comment.objects.create(
             post=self.another_post, author=self.user, text="Чужой пост"
         )
@@ -202,12 +260,22 @@ class UpdateCommentTestCase(APITestCase):
             update_comment(data, comment_id=self.comment.id, sender=self.user)
 
     def test_cannot_update_reply_to_to_none_on_reply(self):
+        """
+        Попытка сбросить reply_to в None для комментария, у которого есть thread.
+        Ожидаем ValidationError, потому что reply_to не может быть None для ответов.
+        """
+
         # reply_comment изначально указывает на comment
         data = {"reply_to_id": None}
         with self.assertRaises(ValidationError):
             update_comment(data, comment_id=self.reply_comment.id, sender=self.user)
 
     def test_update_by_non_author(self):
+        """
+        Попытка обновления комментария пользователем, который не является автором.
+        Ожидаем PermissionDenied.
+        """
+
         data = {"text": "Не должно получиться"}
         with self.assertRaises(PermissionDenied):
             update_comment(data, comment_id=self.comment.id, sender=self.other_user)
