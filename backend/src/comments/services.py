@@ -14,6 +14,7 @@ def create_comment(
 
     thread = None
     reply_to_comment = None
+    reply_to_author = None
 
     thread_id = data.get("thread_id")
     reply_to_id = data.get("reply_to_id")
@@ -38,13 +39,15 @@ def create_comment(
             raise ValidationError(
                 {"reply_to": "Комментарий reply_to не принадлежит данному посту."}
             )
-        # reply_to может быть любым комментом в этой ветке
+        # храним модель CustomUser чтобы при удалении комментарии можно было узнать автора
+        reply_to_author = reply_to_comment.author
 
     comment = Comment.objects.create(
         post=post,
         author=author,
         thread=thread,
         reply_to=reply_to_comment,
+        reply_to_author=reply_to_author,
         text=data.get("text"),
     )
 
