@@ -16,21 +16,7 @@ def create_comment(
     reply_to_comment = None
     reply_to_author = None
 
-    thread_id = data.get("thread_id")
     reply_to_id = data.get("reply_to_id")
-
-    # Проверяем thread (верхний комментарий ветки)
-    if thread_id is not None:
-        thread_comment = get_comment(comment_id=thread_id)
-        if thread_comment.post_id != post.id:
-            raise ValidationError(
-                {"thread_id": "Комментарий thread не принадлежит данному посту."}
-            )
-        # thread — всегда самый верхний в ветке
-        if thread_comment.thread_id is not None:
-            thread = thread_comment.thread_id
-        else:
-            thread = thread_comment
 
     # Проверяем reply_to (конкретный коммент, на который отвечаем)
     if reply_to_id is not None:
@@ -39,6 +25,11 @@ def create_comment(
             raise ValidationError(
                 {"reply_to": "Комментарий reply_to не принадлежит данному посту."}
             )
+
+        if reply_to_comment.thread_id is not None:
+            thread = reply_to_comment.thread
+        else:
+            thread = reply_to_comment
         # храним модель CustomUser чтобы при удалении комментарии можно было узнать автора
         reply_to_author = reply_to_comment.author
 
