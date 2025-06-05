@@ -4,6 +4,7 @@ from comments.views import (
     get_post_comments_view,
     get_comment_replies_view,
     update_comment_view,
+    delete_comment_view,
 )
 
 urlpatterns = [
@@ -26,5 +27,10 @@ urlpatterns = [
         route="update/<int:comment_id>/",
         view=update_comment_view,
         name="update_comment",
+    ),
+    path(
+        route="delete/<int:comment_id>/",
+        view=delete_comment_view,
+        name="delete_comment",
     ),
 ]

@@ -78,3 +78,12 @@ def update_comment(
     comment.save()
 
     return comment
+
+
+def delete_comment(comment_id: int, sender: CustomUser) -> None:
+    comment = get_comment(comment_id=comment_id)
+
+    if comment.author != sender:
+        raise PermissionDenied()
+
+    comment.delete()

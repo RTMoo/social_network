@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
-from comments.services import create_comment, update_comment
+from comments.services import create_comment, update_comment, delete_comment
 from comments.selectors import get_post_comments, get_comment_replies
 from comments.serializers import CommentSerializer, CommentUpdateSerializer
 from drf_spectacular.utils import extend_schema
@@ -71,3 +71,11 @@ def update_comment_view(request: Request, comment_id: int):
     data = CommentSerializer(instance=updated_comment).data
 
     return Response(data=data, status=status.HTTP_200_OK)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_comment_view(request: Request, comment_id: int):
+    delete_comment(comment_id=comment_id, sender=request.user)
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
