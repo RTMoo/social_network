@@ -13,11 +13,21 @@ class Comment(models.Model):
         null=True,
         related_name="comments",
     )
-    parent = models.ForeignKey(
+    thread = models.ForeignKey(
         to="self",
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         default=None,
+        related_name="thread_comments",
+    )
+    reply_to = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+        related_name="replies_to",
     )
     text = models.TextField(max_length=256)
     created_at = models.DateTimeField(auto_now_add=True)
