@@ -10,3 +10,8 @@ class CommentSerializer(serializers.Serializer):
     text = serializers.CharField(max_length=256)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
+
+
+class CommentUpdateSerializer(serializers.Serializer):
+    reply_to_id = serializers.IntegerField(required=False, allow_null=True)
+    text = serializers.CharField(max_length=256)

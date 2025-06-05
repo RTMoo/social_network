@@ -3,6 +3,7 @@ from comments.views import (
     create_comment_view,
     get_post_comments_view,
     get_comment_replies_view,
+    update_comment_view,
 )
 
 urlpatterns = [
@@ -20,5 +21,10 @@ urlpatterns = [
         route="replies/<int:comment_id>/",
         view=get_comment_replies_view,
         name="get_comment_replies",
+    ),
+    path(
+        route="update/<int:comment_id>/",
+        view=update_comment_view,
+        name="update_comment",
     ),
 ]
