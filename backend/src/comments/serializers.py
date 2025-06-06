@@ -14,5 +14,4 @@ class CommentSerializer(serializers.Serializer):
 
 
 class CommentUpdateSerializer(serializers.Serializer):
-    reply_to_id = serializers.IntegerField(required=False, allow_null=True)
     text = serializers.CharField(max_length=256)

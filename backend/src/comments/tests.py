@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied
 from django.urls import reverse
 from accounts.models import CustomUser
 from posts.models import Post
@@ -75,7 +75,6 @@ class CreateCommentTestCase(APITestCase):
 
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        print(response.data)
 
         reply_comment = Comment.objects.get(id=response.data["id"])
         self.assertEqual(reply_comment.thread, first_comment)
@@ -234,41 +233,6 @@ class UpdateCommentTestCase(APITestCase):
         data = {"text": "Обновленный текст"}
         updated = update_comment(data, comment_id=self.comment.id, sender=self.user)
         self.assertEqual(updated.text, "Обновленный текст")
-
-    def test_update_reply_to_success(self):
-        """
-        Успешное обновление поля reply_to у комментария.
-        """
-
-        data = {"reply_to_id": self.comment.id}
-        updated = update_comment(
-            data, comment_id=self.reply_comment.id, sender=self.user
-        )
-        self.assertEqual(updated.reply_to, self.comment)
-
-    def test_update_reply_to_invalid_post(self):
-        """
-        Попытка изменить reply_to на комментарий из другого поста.
-        Ожидаем ValidationError.
-        """
-
-        another_comment = Comment.objects.create(
-            post=self.another_post, author=self.user, text="Чужой пост"
-        )
-        data = {"reply_to_id": another_comment.id}
-        with self.assertRaises(ValidationError):
-            update_comment(data, comment_id=self.comment.id, sender=self.user)
-
-    def test_cannot_update_reply_to_to_none_on_reply(self):
-        """
-        Попытка сбросить reply_to в None для комментария, у которого есть thread.
-        Ожидаем ValidationError, потому что reply_to не может быть None для ответов.
-        """
-
-        # reply_comment изначально указывает на comment
-        data = {"reply_to_id": None}
-        with self.assertRaises(ValidationError):
-            update_comment(data, comment_id=self.reply_comment.id, sender=self.user)
 
     def test_update_by_non_author(self):
         """

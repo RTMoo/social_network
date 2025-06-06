@@ -52,29 +52,10 @@ def update_comment(
 ) -> Comment:
     comment = get_comment(comment_id=comment_id)
 
-    if comment.author != sender:
+    if comment.author_id != sender.id:
         raise PermissionDenied()
 
-    reply_to_id = data.get("reply_to_id")
-
-    if "reply_to_id" in data:
-        if comment.thread_id is not None and reply_to_id is None:
-            raise ValidationError(
-                {"reply_to": "reply_to_id не может быть None на первом уровне."}
-            )
-
-        elif reply_to_id is not None:
-            reply_to_comment = get_comment(comment_id=reply_to_id)
-            if reply_to_comment.post_id != comment.post_id:
-                raise ValidationError(
-                    {"reply_to": "Комментарий reply_to не принадлежит данному посту."}
-                )
-            comment.reply_to = reply_to_comment
-
-    text = data.get("text")
-    if text is not None:
-        comment.text = text
-
+    comment.text = data.get("text")
     comment.save()
 
     return comment
