@@ -28,4 +28,4 @@ def get_comment_replies(comment_id: int):
     Возвращает все ответы под родительским комментарием
     """
 
-    return Comment.objects.filter(thread_id=comment_id).select_related("author")
+    return Comment.objects.filter(thread_id=comment_id).select_related("author", "reply_to", "reply_to_author")
