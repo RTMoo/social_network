@@ -19,7 +19,7 @@ def create_comment_view(request: Request):
     serializer = CommentSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    created_comment = create_comment(serializer.validated_data, author=request.user)
+    created_comment = create_comment(serializer.validated_data, sender=request.user)
 
     data = CommentSerializer(instance=created_comment).data
 
