@@ -3,6 +3,7 @@ from comments.views import (
     create_comment_view,
     get_post_comments_view,
     get_comment_replies_view,
+    get_user_comments_view,
     update_comment_view,
     delete_comment_view,
 )
@@ -19,17 +20,22 @@ urlpatterns = [
         name="get_post_comments",
     ),
     path(
-        route="replies/<int:comment_id>/",
+        route="<int:comment_id>/replies/",
         view=get_comment_replies_view,
         name="get_comment_replies",
     ),
     path(
-        route="update/<int:comment_id>/",
+        route="user/<str:username>/",
+        view=get_user_comments_view,
+        name="get_user_comments",
+    ),
+    path(
+        route="<int:comment_id>/update/",
         view=update_comment_view,
         name="update_comment",
     ),
     path(
-        route="delete/<int:comment_id>/",
+        route="<int:comment_id>/delete/",
         view=delete_comment_view,
         name="delete_comment",
     ),
