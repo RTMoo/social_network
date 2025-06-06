@@ -12,14 +12,14 @@ def create_comment(
 ) -> Comment:
     """
     Создает новый комментарий.
-    
+
     Args:
         data: dict со следующими полями:
             post_id: int - id поста, к которомуعلقется комментарий
             reply_to_id: int - id комментария, на который отвечаем (опционально)
             text: str - текст комментария
         author: CustomUser - автор комментария
-    
+
     Returns:
         Comment - созданный комментарий
     """
@@ -64,7 +64,6 @@ def update_comment(
     comment_id: int,
     sender: CustomUser,
 ) -> Comment:
-    
     """
     Обновляет существующий комментарий.
 
