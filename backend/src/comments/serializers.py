@@ -9,6 +9,7 @@ class CommentSerializer(serializers.Serializer):
     reply_to_author = serializers.CharField(read_only=True)
     author = serializers.CharField(source="author.username", read_only=True)
     text = serializers.CharField(max_length=256)
+    likes_count = serializers.IntegerField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 
