@@ -1,21 +1,31 @@
 from django.urls import path
-from likes.views import like_object_view, get_user_post_likes_view, get_user_comment_likes_view
+from likes.views import (
+    like_comment_view,
+    like_post_view,
+    get_user_liked_comments_view,
+    get_user_liked_posts_view,
+)
 
 
 urlpatterns = [
     path(
-        route="toggle/",
-        view=like_object_view,
-        name="create_like_view",
+        route="post/<int:post_id>/",
+        view=like_post_view,
+        name="like_post",
     ),
     path(
-        route="<str:username>/posts/",
-        view=get_user_post_likes_view,
+        route="comment/<int:comment_id>/",
+        view=like_comment_view,
+        name="like_comment",
+    ),
+    path(
+        route="users/<str:username>/posts/",
+        view=get_user_liked_posts_view,
         name="get_user_post_likes",
     ),
     path(
-        route="<str:username>/comments/",
-        view=get_user_comment_likes_view,
+        route="users/<str:username>/comments/",
+        view=get_user_liked_comments_view,
         name="get_user_comment_likes",
     ),
 ]

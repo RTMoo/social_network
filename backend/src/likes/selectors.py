@@ -1,26 +1,39 @@
 from likes.models import Like
+from posts.models import Post
+from comments.models import Comment
 
 
-def get_user_likes_by_type(username: str, type: str):
+def get_user_liked_posts(username: str) -> list[Post]:
     """
-    Возвращает все лайки, поставленные пользователем с указанным именем к комментариям или постам.
+    Возвращает все лайки, поставленные пользователем с указанным именем к постам.
 
     Args:
         username: str - имя пользователя
 
     Returns:
-        Queryset[Like | Comment]
+        list[Post]
     """
 
-    if type == "post":
-        likes = Like.objects.filter(user__username=username, post__isnull=False).select_related("post__author").all()
-        posts = [like.post for like in likes]
-        
-        return posts
-    elif type == "comment":
-        likes = Like.objects.filter(user__username=username, comment__isnull=False).select_related("comment__author").all()
-        comments = [like.comment for like in likes]
+    likes = Like.objects.filter(
+        user__username=username, post__isnull=False
+    ).select_related("post__author")
 
-        return comments
+    return [like.post for like in likes]
 
-    raise ValueError("Invalid type")
+
+def get_user_liked_comments(username: str) -> list[Comment]:
+    """
+    Возвращает все лайки, поставленные пользователем с указанным именем к комментариям.
+
+    Args:
+        username: str - имя пользователя
+
+    Returns:
+        list[Comment]
+    """
+
+    likes = Like.objects.filter(
+        user__username=username, comment__isnull=False
+    ).select_related("comment__author")
+
+    return [like.comment for like in likes]

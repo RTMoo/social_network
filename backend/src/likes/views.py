@@ -4,25 +4,26 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
-from likes.serializers import LikeSerializer
-from likes.services import like_object
-from likes.selectors import get_user_likes_by_type
+from likes.services import like_post, like_comment
+from likes.selectors import get_user_liked_comments, get_user_liked_posts
 from posts.serializers import PostSerializer
 from comments.serializers import CommentSerializer
 
 
-@extend_schema(
-    request=LikeSerializer,
-)
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def like_object_view(request: Request):
-    serializer = LikeSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
+def like_post_view(request: Request, post_id: int):
+    liked = like_post(post_id=post_id, sender=request.user)
 
-    like_object(data=serializer.validated_data, sender=request.user)
+    return Response(data=liked, status=status.HTTP_200_OK)
 
-    return Response(status=status.HTTP_201_CREATED)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def like_comment_view(request: Request, comment_id: int):
+    liked = like_comment(comment_id=comment_id, sender=request.user)
+
+    return Response(data=liked, status=status.HTTP_200_OK)
 
 
 @extend_schema(
@@ -30,8 +31,8 @@ def like_object_view(request: Request):
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def get_user_post_likes_view(request: Request, username: str):
-    liked_posts = get_user_likes_by_type(username=username, type="post")
+def get_user_liked_posts_view(request: Request, username: str):
+    liked_posts = get_user_liked_posts(username=username)
 
     data = PostSerializer(instance=liked_posts, many=True).data
 
@@ -43,8 +44,8 @@ def get_user_post_likes_view(request: Request, username: str):
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def get_user_comment_likes_view(request: Request, username: str):
-    liked_comments = get_user_likes_by_type(username=username, type="comment")
+def get_user_liked_comments_view(request: Request, username: str):
+    liked_comments = get_user_liked_comments(username=username)
 
     data = CommentSerializer(instance=liked_comments, many=True).data
 
