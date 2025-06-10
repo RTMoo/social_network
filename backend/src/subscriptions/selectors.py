@@ -19,7 +19,8 @@ def get_subscribe(sender: CustomUser, username: str) -> Subscription:
     """
 
     subscription = Subscription.objects.filter(
-        subscriber=sender, to_subscribe__username=username
+        subscriber=sender,
+        to_subscribe__username=username,
     ).first()
 
     if not subscription:
@@ -44,7 +45,7 @@ def get_user_subscriptions(username: str) -> list[str]:
         .select_related("to_subscribe")
         .all()
     )
-    
+
     return [subscribe.to_subscribe.username for subscribe in subscriptions]
 
 
@@ -58,11 +59,11 @@ def get_user_subscribers(username: str) -> list[str]:
     Returns:
         list[str]: Список username пользователей.
     """
-    
+
     subscribers = (
         Subscription.objects.filter(to_subscribe__username=username)
         .select_related("subscriber")
         .all()
     )
-    
+
     return [subscribe.subscriber.username for subscribe in subscribers]
