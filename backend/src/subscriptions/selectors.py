@@ -26,3 +26,43 @@ def get_subscribe(sender: CustomUser, username: str) -> Subscription:
         raise NotFound(detail="Подписка не найдена.")
 
     return subscription
+
+
+def get_user_subscriptions(username: str) -> list[str]:
+    """
+    Возвращает список username пользователей, на которых подписан переданный пользователь.
+
+    Args:
+        username (str): Имя пользователя.
+
+    Returns:
+        list[str]: Список username пользователей.
+    """
+
+    subscriptions = (
+        Subscription.objects.filter(subscriber__username=username)
+        .select_related("to_subscribe")
+        .all()
+    )
+    
+    return [subscribe.to_subscribe.username for subscribe in subscriptions]
+
+
+def get_user_subscribers(username: str) -> list[str]:
+    """
+    Возвращает список username пользователей, которые подписаны на переданного пользователя.
+
+    Args:
+        username (str): Имя пользователя.
+
+    Returns:
+        list[str]: Список username пользователей.
+    """
+    
+    subscribers = (
+        Subscription.objects.filter(to_subscribe__username=username)
+        .select_related("subscriber")
+        .all()
+    )
+    
+    return [subscribe.subscriber.username for subscribe in subscribers]
