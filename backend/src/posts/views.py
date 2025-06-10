@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 from posts.serializers import PostSerializer
 from posts.services import create_post, update_post, delete_post
-from posts.selectors import get_user_posts, get_post
+from posts.selectors import get_user_posts, get_post, get_subscription_posts
 
 
 @extend_schema(
@@ -74,3 +74,13 @@ def delete_post_view(request: Request, post_id: int):
     delete_post(post_id=post_id, author=request.user)
 
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_subscribtion_posts_view(request: Request):
+    posts = get_subscription_posts(username=request.user.username)
+
+    data = PostSerializer(instance=posts, many=True).data
+
+    return Response(data=data, status=status.HTTP_200_OK)
