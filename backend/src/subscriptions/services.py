@@ -24,10 +24,10 @@ def subscribe(sender: CustomUser, username: str) -> None:
     if sender.username == username:
         raise ValidationError("Нельзя подписаться на самого себя.")
 
-    author = get_user(username=username)
+    to_subscribe = get_user(username=username)
 
     try:
-        Subscription.objects.create(subscriber=sender, author=author)
+        Subscription.objects.create(subscriber=sender, to_subscribe=to_subscribe)
     except IntegrityError:
         raise ValidationError("Подписка уже существует.")
 

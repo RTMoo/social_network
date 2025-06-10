@@ -19,7 +19,7 @@ def get_subscribe(sender: CustomUser, username: str) -> Subscription:
     """
 
     subscription = Subscription.objects.filter(
-        subscriber=sender, author__username=username
+        subscriber=sender, to_subscribe__username=username
     ).first()
 
     if not subscription:
