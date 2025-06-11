@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "comments",
     "likes",
     "subscriptions",
+    "friendships",
     "django_countries",
     "silk",
 ]
