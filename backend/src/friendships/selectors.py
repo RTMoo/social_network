@@ -1,4 +1,5 @@
 from friendships.models import FriendshipRequest, Friendship
+from friendships.utils import sort_models
 from rest_framework.exceptions import NotFound
 
 
@@ -22,7 +23,7 @@ def friend_exists(user1, user2) -> bool:
     Проверяет, существует ли дружба между двумя пользователями.
     """
 
-    user1, user2 = sorted([user1, user2], key=lambda user: user.pk)
+    user1, user2 = sort_models([user1, user2])
 
     return Friendship.objects.filter(user1=user1, user2=user2).exists()
 

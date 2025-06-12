@@ -5,6 +5,7 @@ from accounts.selectors import get_user
 from accounts.models import CustomUser
 from friendships.models import FriendshipRequest, Friendship
 from friendships.selectors import get_friendship_request, friend_exists, request_exists
+from friendships.utils import sort_models
 
 
 def create_friendship_request(
@@ -58,29 +59,26 @@ def create_friendship(
     data: dict[str, Any],
 ) -> Friendship:
     """
-    Создаёт запрос на дружбу от from_user к пользователю с username из data.
+    Принимает запрос на дружбу от from_user и создаёт объект дружбы между ним и to_user.
 
-    Проверяет:
-    - Если пользователи уже друзья — ошибка.
-    - Если есть обратный запрос — ошибка.
-    - Если запрос уже существует — ошибка через IntegrityError.
+    Проверяет наличие запроса, затем создаёт запись дружбы и удаляет запрос.
 
     Args:
-        from_user (CustomUser): Пользователь, отправляющий запрос.
-        data (dict[str, Any]): Словарь с ключом "to_user" (username получателя).
+        to_user (CustomUser): Пользователь, принимающий запрос.
+        data (dict[str, Any]): Словарь с ключом "from_user" (username отправителя).
 
     Returns:
-        FriendshipRequest: Созданный запрос на дружбу.
+        Friendship: Объект дружбы между двумя пользователями.
 
     Raises:
-        ValidationError: Если запрос недопустим.
+        ValidationError: Если дружба уже существует.
     """
 
     from_user = get_user(username=data["from_user"])
     request = get_friendship_request(to_user=to_user, from_user=from_user)
 
     # Сортировка по ключу если чтобы исключить случай когда A=B и B=A
-    user1, user2 = sorted([to_user, from_user], key=lambda user: user.pk)
+    user1, user2 = sort_models([from_user, to_user])
 
     try:
         with transaction.atomic():
