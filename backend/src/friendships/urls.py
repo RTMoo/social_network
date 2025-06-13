@@ -7,17 +7,17 @@ from friendships.views import (
 
 urlpatterns = [
     path(
-        route="requests/send/",
+        route="requests/<str:username>/send/",
         view=FriendshipRequestView.as_view(),
         name="send_friendship_request",
     ),
     path(
-        route="requests/accept/",
+        route="requests/<str:username>/accept/",
         view=FriendshipRequestAcceptView.as_view(),
         name="accept_friendship_request",
     ),
     path(
-        route="requests/reject/",
+        route="requests/<str:username>/reject/",
         view=FriendshipRequestRejectView.as_view(),
         name="reject_friendship_request",
     ),

@@ -24,8 +24,8 @@ def get_friendship_request(
 
 
 def friend_exists(
-    user1,
-    user2,
+    user1: CustomUser,
+    user2: CustomUser,
 ) -> bool:
     """
     Проверяет, существует ли дружба между двумя пользователями.

@@ -1,4 +1,3 @@
-from typing import Any
 from django.db import IntegrityError, transaction
 from rest_framework.exceptions import ValidationError, NotFound
 from accounts.selectors import get_user
@@ -12,12 +11,12 @@ from friendships.selectors import (
 from friendships.utils import sort_models
 
 
-def create_friendship_request(
-    from_user: CustomUser,
-    data: dict[str, Any],
+def send_friendship_request(
+    current_user: CustomUser,
+    username: str,
 ) -> FriendshipRequest:
     """
-    Создаёт запрос на дружбу от from_user к пользователю с username из data.
+    Создаёт запрос на дружбу от текущего пользователя к пользователю с username.
 
     Проверки:
     - Если пользователи уже друзья — ошибка.
@@ -26,7 +25,7 @@ def create_friendship_request(
 
     Args:
         from_user (CustomUser): Пользователь, отправляющий запрос.
-        data (dict[str, Any]): Словарь, содержащий ключ "to_user" с username получателя.
+        username: username получателя.
 
     Returns:
         FriendshipRequest: Созданный объект запроса на дружбу.
@@ -35,30 +34,28 @@ def create_friendship_request(
         ValidationError: Если запрос недопустим (дружба уже есть или запрос уже отправлен).
     """
 
-    to_user = get_user(username=data["to_user"])
+    to_user = get_user(username=username)
 
-    if from_user.username == to_user.username:
+    if current_user.username == username:
         raise ValidationError({"to_user": "Нельзя отправить запрос самому себе"})
 
-    if friend_exists(user1=from_user, user2=to_user):
-        raise ValidationError({"to_user": f"Вы уже дружите с {to_user.username}"})
+    if friend_exists(user1=current_user, user2=to_user):
+        raise ValidationError({"to_user": f"Вы уже дружите с {username}"})
 
-    request = get_friendship_request_between(from_user=from_user, to_user=to_user)
+    request = get_friendship_request_between(from_user=current_user, to_user=to_user)
 
     if request is not None:
         if request.to_user == to_user:
             raise ValidationError(
-                {"to_user": f"Вы уже отправили запрос на дружбу для {to_user.username}"}
+                {"to_user": f"Вы уже отправили запрос на дружбу для {username}"}
             )
         else:
-            raise ValidationError(
-                {"to_user": f"{to_user.username} уже отправил(а) вам запрос"}
-            )
+            raise ValidationError({"to_user": f"{username} уже отправил(а) вам запрос"})
 
     try:
         with transaction.atomic():
             request = FriendshipRequest.objects.create(
-                from_user=from_user, to_user=to_user
+                from_user=current_user, to_user=to_user
             )
 
             return request
@@ -71,67 +68,56 @@ def create_friendship_request(
 
 def accept_friendship_request(
     to_user: CustomUser,
-    data: dict[str, Any],
+    username: str,
 ) -> Friendship:
     """
-    Принимает запрос на дружбу от from_user и создаёт объект дружбы между ним и to_user.
-
-    Проверяет наличие запроса, затем создаёт запись дружбы и удаляет запрос.
+    Принимает запрос на дружбу от пользователя с username и создаёт объект дружбы.
 
     Args:
         to_user (CustomUser): Пользователь, принимающий запрос.
-        data (dict[str, Any]): Словарь с ключом "from_user" (username отправителя).
+        from_username (str): Username пользователя, отправившего запрос.
 
     Returns:
         Friendship: Объект дружбы между двумя пользователями.
 
     Raises:
         ValidationError: Если дружба уже существует.
+        NotFound: Если запрос не найден.
     """
 
-    from_user = get_user(username=data["from_user"])
+    from_user = get_user(username=username)
     request = get_friendship_request(to_user=to_user, from_user=from_user)
 
-    # Сортировка по ключу если чтобы исключить случай когда A=B и B=A
     user1, user2 = sort_models([from_user, to_user])
 
     try:
         with transaction.atomic():
-            friendship = Friendship.objects.create(
-                user1=user1,
-                user2=user2,
-            )
+            friendship = Friendship.objects.create(user1=user1, user2=user2)
             request.delete()
-
-        return friendship
+            return friendship
     except IntegrityError:
         raise ValidationError({"from_user": f"Вы уже дружите с {from_user.username}"})
 
 
 def reject_friendship_request(
-    from_user: CustomUser,
-    data: dict[str, Any],
+    current_user: CustomUser,
+    username: str,
 ) -> None:
     """
-    Отклоняет (удаляет) запрос на дружбу между from_user и to_user.
-
-    Проверяет наличие запроса на дружбу в любом направлении между пользователями и удаляет его.
+    Отклоняет (удаляет) запрос на дружбу между текущим пользователем и другим.
 
     Args:
-        from_user (CustomUser): Пользователь, отклоняющий запрос.
-        data (dict[str, Any]): Словарь с ключом "to_user" (username второго пользователя).
-
-    Returns:
-        None
+        current_user (CustomUser): Пользователь, отклоняющий запрос.
+        other_username (str): Username второго пользователя.
 
     Raises:
         NotFound: Если запрос на дружбу не существует.
     """
 
-    to_user = get_user(username=data["to_user"])
-    request = get_friendship_request_between(from_user=from_user, to_user=to_user)
+    other_user = get_user(username=username)
+    request = get_friendship_request_between(from_user=current_user, to_user=other_user)
 
     if not request:
-        raise NotFound(detail="Запрос дружбы не найден")
+        raise NotFound(detail="Запрос дружбы не найден")
 
     request.delete()
