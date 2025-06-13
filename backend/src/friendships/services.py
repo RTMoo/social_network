@@ -44,7 +44,16 @@ def create_friendship_request(
         raise ValidationError({"to_user": f"Вы уже дружите с {to_user.username}"})
 
     request = get_friendship_request_between(from_user=from_user, to_user=to_user)
-    
+
+    if request is not None:
+        if request.to_user == to_user:
+            raise ValidationError(
+                {"to_user": f"Вы уже отправили запрос на дружбу для {to_user.username}"}
+            )
+        else:
+            raise ValidationError(
+                {"to_user": f"{to_user.username} уже отправил(а) вам запрос"}
+            )
 
     try:
         with transaction.atomic():
@@ -52,10 +61,11 @@ def create_friendship_request(
                 from_user=from_user, to_user=to_user
             )
 
-        return request
+            return request
+
     except IntegrityError:
         raise ValidationError(
-            {"to_user": f"Вы уже запрашивали дружбу для {to_user.username}"}
+            {"to_user": f"Вы уже отправили запрос на дружбу для {to_user.username}"}
         )
 
 
@@ -102,6 +112,22 @@ def reject_friendship_request(
     from_user: CustomUser,
     data: dict[str, Any],
 ) -> None:
+    """
+    Отклоняет (удаляет) запрос на дружбу между from_user и to_user.
+
+    Проверяет наличие запроса на дружбу в любом направлении между пользователями и удаляет его.
+
+    Args:
+        from_user (CustomUser): Пользователь, отклоняющий запрос.
+        data (dict[str, Any]): Словарь с ключом "to_user" (username второго пользователя).
+
+    Returns:
+        None
+
+    Raises:
+        NotFound: Если запрос на дружбу не существует.
+    """
+
     to_user = get_user(username=data["to_user"])
     request = get_friendship_request_between(from_user=from_user, to_user=to_user)
 

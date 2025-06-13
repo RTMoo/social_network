@@ -93,19 +93,25 @@ class FriendshipTests(APITestCase):
         """
         self.client.force_authenticate(user=self.user_2)
         self.client.post(self.send_request_url, data={"to_user": self.user_1.username})
-        
+
         self.client.force_authenticate(user=self.user_1)
-        response = self.client.post(self.reject_request_url, data={"to_user": self.user_2.username})
-        
+        response = self.client.post(
+            self.reject_request_url, data={"to_user": self.user_2.username}
+        )
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(FriendshipRequest.objects.count(), 0)
 
         self.client.force_authenticate(user=self.user_2)
-        response = self.client.post(self.reject_request_url, data={"to_user": self.user_1.username})
-        
+        response = self.client.post(
+            self.reject_request_url, data={"to_user": self.user_1.username}
+        )
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        
+
         self.client.force_authenticate(user=self.user_1)
-        response = self.client.post(self.reject_request_url, data={"to_user": self.user_2.username})
-        
+        response = self.client.post(
+            self.reject_request_url, data={"to_user": self.user_2.username}
+        )
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
