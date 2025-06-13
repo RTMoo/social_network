@@ -15,9 +15,15 @@ class FriendshipTests(APITestCase):
             email="b@c.com", username="user2", password="pass1234"
         )
 
-        self.send_request_url = lambda username: reverse("send_friendship_request", kwargs={"username": username})
-        self.reject_request_url = lambda username: reverse("reject_friendship_request", kwargs={"username": username})
-        self.accept_friendship_url = lambda username: reverse("accept_friendship_request", kwargs={"username": username})
+        self.send_request_url = lambda username: reverse(
+            "send_friendship_request", kwargs={"username": username}
+        )
+        self.reject_request_url = lambda username: reverse(
+            "reject_friendship_request", kwargs={"username": username}
+        )
+        self.accept_friendship_url = lambda username: reverse(
+            "accept_friendship_request", kwargs={"username": username}
+        )
 
     def test_send_friendship_request(self):
         self.client.force_authenticate(user=self.user_1)

@@ -114,8 +114,8 @@ def reject_friendship_request(
         NotFound: Если запрос на дружбу не существует.
     """
 
-    other_user = get_user(username=username)
-    request = get_friendship_request_between(from_user=current_user, to_user=other_user)
+    to_user = get_user(username=username)
+    request = get_friendship_request_between(from_user=current_user, to_user=to_user)
 
     if not request:
         raise NotFound(detail="Запрос дружбы не найден")

@@ -58,7 +58,7 @@ class FriendshipRequestRejectView(APIView):
         request=None,
         responses={status.HTTP_204_NO_CONTENT: None},
     )
-    def post(self, request: Request, username: str):
+    def delete(self, request: Request, username: str):
         services.reject_friendship_request(
             current_user=request.user,
             username=username,
