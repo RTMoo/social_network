@@ -1,18 +1,24 @@
 from django.urls import path
 from friendships.views import (
+    FriendshipRequestAcceptView,
     FriendshipRequestView,
-    FriendshipView,
+    FriendshipRequestRejectView,
 )
 
 urlpatterns = [
     path(
-        route="requests/",
+        route="requests/send/",
         view=FriendshipRequestView.as_view(),
-        name="friendship_request",
+        name="send_friendship_request",
     ),
     path(
-        route="friends/",
-        view=FriendshipView.as_view(),
-        name="friendship",
+        route="requests/accept/",
+        view=FriendshipRequestAcceptView.as_view(),
+        name="accept_friendship_request",
+    ),
+    path(
+        route="requests/reject/",
+        view=FriendshipRequestRejectView.as_view(),
+        name="reject_friendship_request",
     ),
 ]

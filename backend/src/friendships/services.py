@@ -1,10 +1,14 @@
 from typing import Any
 from django.db import IntegrityError, transaction
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from accounts.selectors import get_user
 from accounts.models import CustomUser
 from friendships.models import FriendshipRequest, Friendship
-from friendships.selectors import get_friendship_request, friend_exists, request_exists
+from friendships.selectors import (
+    get_friendship_request,
+    friend_exists,
+    get_friendship_request_between,
+)
 from friendships.utils import sort_models
 
 
@@ -33,13 +37,14 @@ def create_friendship_request(
 
     to_user = get_user(username=data["to_user"])
 
+    if from_user.username == to_user.username:
+        raise ValidationError({"to_user": "Нельзя отправить запрос самому себе"})
+
     if friend_exists(user1=from_user, user2=to_user):
         raise ValidationError({"to_user": f"Вы уже дружите с {to_user.username}"})
 
-    if request_exists(to_user=from_user, from_user=to_user):
-        raise ValidationError(
-            {"to_user": f"{to_user.username} уже отправил(а) вам запрос"}
-        )
+    request = get_friendship_request_between(from_user=from_user, to_user=to_user)
+    
 
     try:
         with transaction.atomic():
@@ -54,7 +59,7 @@ def create_friendship_request(
         )
 
 
-def create_friendship(
+def accept_friendship_request(
     to_user: CustomUser,
     data: dict[str, Any],
 ) -> Friendship:
@@ -91,3 +96,16 @@ def create_friendship(
         return friendship
     except IntegrityError:
         raise ValidationError({"from_user": f"Вы уже дружите с {from_user.username}"})
+
+
+def reject_friendship_request(
+    from_user: CustomUser,
+    data: dict[str, Any],
+) -> None:
+    to_user = get_user(username=data["to_user"])
+    request = get_friendship_request_between(from_user=from_user, to_user=to_user)
+
+    if not request:
+        raise NotFound(detail="Запрос дружбы не найден")
+
+    request.delete()
