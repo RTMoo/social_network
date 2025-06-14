@@ -26,6 +26,9 @@ class FriendshipTests(APITestCase):
         )
 
     def test_send_friendship_request(self):
+        """
+        Тестирует отправку запроса на дружбу
+        """
         self.client.force_authenticate(user=self.user_1)
         response = self.client.post(self.send_request_url(self.user_2.username))
 
@@ -37,6 +40,9 @@ class FriendshipTests(APITestCase):
         self.assertEqual(request.to_user, self.user_2)
 
     def test_accept_request(self):
+        """
+        Тестирует подтверждение запроса на дружбу
+        """
         self.client.force_authenticate(user=self.user_1)
         self.client.post(self.send_request_url(self.user_2.username))
 
@@ -51,6 +57,11 @@ class FriendshipTests(APITestCase):
         self.assertIn(self.user_2, [friendship.user1, friendship.user2])
 
     def test_duplicate_request_and_friendship(self):
+        """
+        Тестирует:
+        - отправку дублирующего запроса на дружбу
+        - подтверждение дублирующей дружбы
+        """
         self.client.force_authenticate(user=self.user_1)
         response_1 = self.client.post(self.send_request_url(self.user_2.username))
         self.assertEqual(response_1.status_code, status.HTTP_201_CREATED)
@@ -68,18 +79,24 @@ class FriendshipTests(APITestCase):
         self.assertEqual(Friendship.objects.count(), 1)
 
     def test_reject_request(self):
+        """
+        Тестирует:
+        - отмену запроса на дружбу
+        - отмену несуществующего запроса
+        """
         self.client.force_authenticate(user=self.user_2)
         self.client.post(self.send_request_url(self.user_1.username))
 
         self.client.force_authenticate(user=self.user_1)
-        response = self.client.post(self.reject_request_url(self.user_2.username))
+        response = self.client.delete(self.reject_request_url(self.user_2.username))
+
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(FriendshipRequest.objects.count(), 0)
 
         self.client.force_authenticate(user=self.user_2)
-        response = self.client.post(self.reject_request_url(self.user_1.username))
+        response = self.client.delete(self.reject_request_url(self.user_1.username))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
         self.client.force_authenticate(user=self.user_1)
-        response = self.client.post(self.reject_request_url(self.user_2.username))
+        response = self.client.delete(self.reject_request_url(self.user_2.username))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
