@@ -3,6 +3,7 @@ from friendships.views import (
     FriendshipRequestAcceptView,
     FriendshipRequestSendView,
     FriendshipRequestRejectView,
+    FriendshipListView,
 )
 
 urlpatterns = [
@@ -20,5 +21,10 @@ urlpatterns = [
         route="requests/<str:username>/reject/",
         view=FriendshipRequestRejectView.as_view(),
         name="reject_friendship_request",
+    ),
+    path(
+        route="<str:username>/list/",
+        view=FriendshipListView.as_view(),
+        name="friendship_list",
     ),
 ]

@@ -48,3 +48,19 @@ def get_friendship_request_between(
         Q(from_user=from_user, to_user=to_user)
         | Q(from_user=to_user, to_user=from_user)
     ).first()
+
+
+def get_friendships(username: str) -> list[str]:
+    """
+    Возвращает список username друзей пользователя.
+    """
+    friendships = Friendship.objects.filter(
+        Q(user1__username=username) | Q(user2__username=username)
+    ).select_related("user1", "user2")
+
+    return [
+        friend.user2.username
+        if friend.user1.username == username
+        else friend.user1.username
+        for friend in friendships
+    ]
