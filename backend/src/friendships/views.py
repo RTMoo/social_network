@@ -7,6 +7,7 @@ from rest_framework import serializers
 from drf_spectacular.utils import extend_schema
 from friendships import services
 from friendships import selectors
+from friendships.serializers import FriendshipRequestSerializer
 
 
 class FriendshipRequestSendView(APIView):
@@ -14,19 +15,12 @@ class FriendshipRequestSendView(APIView):
     Класс для отправки запроса на дружбу.
     """
 
-    class FriendshipRequestOutputSerializer(serializers.Serializer):
-        """
-        Сериализатор для вывода данных созданного запроса на дружбу.
-        """
-
-        from_user = serializers.CharField(source="from_user.username")
-        to_user = serializers.CharField(source="to_user.username")
-        created_at = serializers.DateTimeField()
-
     permission_classes = [IsAuthenticated]
+    seralizer_class = FriendshipRequestSerializer
 
     @extend_schema(
-        responses=FriendshipRequestOutputSerializer,
+        request=None,
+        responses=FriendshipRequestSerializer,
         summary="Отправить запрос на дружбу",
         description="Отправляет запрос на дружбу пользователю с указанным username.",
     )
@@ -36,7 +30,7 @@ class FriendshipRequestSendView(APIView):
             username=username,
         )
 
-        data = self.FriendshipRequestOutputSerializer(instance=created_data).data
+        data = FriendshipRequestSerializer(instance=created_data).data
 
         return Response(data=data, status=status.HTTP_201_CREATED)
 
@@ -58,6 +52,7 @@ class FriendshipRequestAcceptView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
+        request=None,
         responses=FriendshipAcceptOutputSerializer,
         summary="Подтвердить запрос на дружбу",
         description="Подтверждает запрос на дружбу от пользователя с указанным username.",
@@ -101,6 +96,7 @@ class FriendshipListView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
+        request=None,
         responses=list[str],
         summary="Получить список друзей",
         description="Возвращает список друзей.",
@@ -109,3 +105,44 @@ class FriendshipListView(APIView):
         friendships = selectors.get_friendships(username=username)
 
         return Response(data=friendships, status=status.HTTP_200_OK)
+
+
+class FriendshipSentRequestListView(APIView):
+    """
+    Класс для получения списка запросов на дружбу.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = FriendshipRequestSerializer
+
+    @extend_schema(
+        request=None,
+        responses=FriendshipRequestSerializer,
+        summary="Список запросов на дружбу от текущего пользователя",
+        description="Получить список запросов на дружбу отправленных пользователем",
+    )
+    def get(self, request: Request):
+        friendships = selectors.get_sent_friendship_requests(sender=request.user)
+        data = self.serializer_class(instance=friendships, many=True).data
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+class FriendshipReceivedRequestListView(APIView):
+    """
+    Класс для получения списка запросов на дружбу.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = FriendshipRequestSerializer
+
+    @extend_schema(
+        responses=FriendshipRequestSerializer,
+        summary="Список запросов на дружбу полученных текущим пользователем",
+        description="Получить список запросов на дружбу полученных пользователем",
+    )
+    def get(self, request: Request):
+        friendships = selectors.get_received_friendship_requests(recipient=request.user)
+        data = self.serializer_class(instance=friendships, many=True).data
+
+        return Response(data=data, status=status.HTTP_200_OK)

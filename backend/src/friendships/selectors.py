@@ -1,7 +1,7 @@
 from friendships.models import FriendshipRequest, Friendship
 from friendships.utils import sort_models
 from rest_framework.exceptions import NotFound
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from accounts.models import CustomUser
 
 
@@ -64,3 +64,21 @@ def get_friendships(username: str) -> list[str]:
         else friend.user1.username
         for friend in friendships
     ]
+
+
+def get_sent_friendship_requests(sender: CustomUser) -> QuerySet[FriendshipRequest]:
+    """
+    Возвращает запросы на дружбу отправленные пользователем.
+    """
+
+    return FriendshipRequest.objects.filter(from_user=sender).select_related("from_user", "to_user")
+
+
+def get_received_friendship_requests(
+    recipient: CustomUser,
+) -> QuerySet[FriendshipRequest]:
+    """
+    Возвращает запросы на дружбу полученные пользователем.
+    """
+
+    return FriendshipRequest.objects.filter(to_user=recipient).select_related("from_user", "to_user")

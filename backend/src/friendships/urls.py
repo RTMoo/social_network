@@ -4,6 +4,8 @@ from friendships.views import (
     FriendshipRequestSendView,
     FriendshipRequestRejectView,
     FriendshipListView,
+    FriendshipReceivedRequestListView,
+    FriendshipSentRequestListView,
 )
 
 urlpatterns = [
@@ -26,5 +28,15 @@ urlpatterns = [
         route="<str:username>/list/",
         view=FriendshipListView.as_view(),
         name="friendship_list",
+    ),
+    path(
+        route="requests/received/",
+        view=FriendshipReceivedRequestListView.as_view(),
+        name="friendship_received_request_list",
+    ),
+    path(
+        route="requests/sent/",
+        view=FriendshipSentRequestListView.as_view(),
+        name="friendship_sent_request_list",
     ),
 ]
