@@ -102,7 +102,7 @@ class FriendshipListView(APIView):
         description="Возвращает список друзей.",
     )
     def get(self, request: Request, username: str):
-        friendships = selectors.get_friendships(username=username)
+        friendships = selectors.get_friendship_usernames(username=username)
 
         return Response(data=friendships, status=status.HTTP_200_OK)
 

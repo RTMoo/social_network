@@ -50,13 +50,18 @@ def get_friendship_request_between(
     ).first()
 
 
-def get_friendships(username: str) -> list[str]:
+def get_friendship_usernames(
+    username: str,
+) -> list[str]:
     """
     Возвращает список username друзей пользователя.
     """
     friendships = Friendship.objects.filter(
         Q(user1__username=username) | Q(user2__username=username)
-    ).select_related("user1", "user2")
+    ).select_related(
+        "user1",
+        "user2",
+    )
 
     return [
         friend.user2.username
@@ -66,12 +71,17 @@ def get_friendships(username: str) -> list[str]:
     ]
 
 
-def get_sent_friendship_requests(sender: CustomUser) -> QuerySet[FriendshipRequest]:
+def get_sent_friendship_requests(
+    sender: CustomUser,
+) -> QuerySet[FriendshipRequest]:
     """
     Возвращает запросы на дружбу отправленные пользователем.
     """
 
-    return FriendshipRequest.objects.filter(from_user=sender).select_related("from_user", "to_user")
+    return FriendshipRequest.objects.filter(from_user=sender).select_related(
+        "from_user",
+        "to_user",
+    )
 
 
 def get_received_friendship_requests(
@@ -81,4 +91,7 @@ def get_received_friendship_requests(
     Возвращает запросы на дружбу полученные пользователем.
     """
 
-    return FriendshipRequest.objects.filter(to_user=recipient).select_related("from_user", "to_user")
+    return FriendshipRequest.objects.filter(to_user=recipient).select_related(
+        "from_user",
+        "to_user",
+    )
