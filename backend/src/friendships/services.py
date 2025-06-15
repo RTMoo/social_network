@@ -3,11 +3,7 @@ from rest_framework.exceptions import ValidationError, NotFound
 from accounts.selectors import get_user
 from accounts.models import CustomUser
 from friendships.models import FriendshipRequest, Friendship
-from friendships.selectors import (
-    get_friendship_request,
-    friend_exists,
-    get_friendship_request_between,
-)
+from friendships import selectors
 from friendships.utils import sort_models
 
 
@@ -39,10 +35,12 @@ def send_friendship_request(
     if current_user.username == username:
         raise ValidationError({"to_user": "Нельзя отправить запрос самому себе"})
 
-    if friend_exists(user1=current_user, user2=to_user):
+    if selectors.friend_exists(user1=current_user, user2=to_user):
         raise ValidationError({"to_user": f"Вы уже дружите с {username}"})
 
-    request = get_friendship_request_between(from_user=current_user, to_user=to_user)
+    request = selectors.get_friendship_request_between(
+        from_user=current_user, to_user=to_user
+    )
 
     if request is not None:
         if request.to_user == to_user:
@@ -86,7 +84,7 @@ def accept_friendship_request(
     """
 
     from_user = get_user(username=username)
-    request = get_friendship_request(to_user=to_user, from_user=from_user)
+    request = selectors.get_friendship_request(to_user=to_user, from_user=from_user)
 
     user1, user2 = sort_models([from_user, to_user])
 
@@ -95,6 +93,7 @@ def accept_friendship_request(
             friendship = Friendship.objects.create(user1=user1, user2=user2)
             request.delete()
             return friendship
+
     except IntegrityError:
         raise ValidationError({"from_user": f"Вы уже дружите с {from_user.username}"})
 
@@ -115,9 +114,32 @@ def reject_friendship_request(
     """
 
     to_user = get_user(username=username)
-    request = get_friendship_request_between(from_user=current_user, to_user=to_user)
+    request = selectors.get_friendship_request_between(
+        from_user=current_user, to_user=to_user
+    )
 
     if not request:
         raise NotFound(detail="Запрос дружбы не найден")
 
     request.delete()
+
+
+def delete_friendship(current_user: CustomUser, username: str) -> None:
+    """
+    Удаляет дружбу между текущим пользователем и другим.
+
+    Args:
+        current_user (CustomUser): Пользователь, удаляющий дружбу.
+        username (str): Username второго пользователя.
+
+    Raises:
+        NotFound: Если дружба не существует.
+    """
+
+    to_user = get_user(username=username)
+    friendship = selectors.get_friendship(user1=current_user, user2=to_user)
+
+    if not friendship:
+        raise NotFound(detail="Вы не состоите в дружбе с этим пользователем.")
+
+    friendship.delete()

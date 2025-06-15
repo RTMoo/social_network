@@ -146,3 +146,24 @@ class FriendshipReceivedRequestListView(APIView):
         data = self.serializer_class(instance=friendships, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)
+
+
+class FriendshipDeleteView(APIView):
+    """
+    Класс для удаления дружбы.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=None,
+        responses={status.HTTP_204_NO_CONTENT: None},
+        summary="Удалить дружбу",
+        description="Удаляет дружбу.",
+    )
+    def delete(self, request: Request, username: str):
+        services.delete_friendship(
+            current_user=request.user,
+            username=username,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

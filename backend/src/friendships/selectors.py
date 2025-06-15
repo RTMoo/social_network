@@ -95,3 +95,16 @@ def get_received_friendship_requests(
         "from_user",
         "to_user",
     )
+
+
+def get_friendship(
+    user1: CustomUser,
+    user2: CustomUser,
+) -> Friendship | None:
+    """
+    Возвращает дружбу между двумя пользователями.
+    """
+
+    user1, user2 = sort_models([user1, user2])
+
+    return Friendship.objects.filter(user1=user1, user2=user2).first()
