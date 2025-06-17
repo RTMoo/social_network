@@ -1,5 +1,5 @@
 from typing import Any
-from django.core import cache
+from django.core.cache import cache
 from rest_framework.exceptions import ValidationError, NotFound
 from accounts.models import CustomUser
 from accounts.tasks import send_confirmation_email
@@ -9,7 +9,7 @@ from profiles.services import create_profile
 def register_user(data: dict[str, Any]) -> None:
     user = CustomUser.objects.filter(email=data["email"]).first()
     if user:
-        if user.is_active:
+        if user.email_verified:
             raise ValidationError({"email": "Этот email уже используется"})
 
         # Обновить данные, если пользователь неактивен
@@ -33,7 +33,7 @@ def confirm_code(data: dict[str, Any]) -> None:
     if not user:
         raise NotFound(detail="Пользователь не найден")
 
-    if user.email_confirmed:
+    if user.email_verified:
         raise ValidationError(detail="Почта уже подтверждена")
 
     real_code = cache.get(email)
@@ -46,7 +46,7 @@ def confirm_code(data: dict[str, Any]) -> None:
     if code != real_code:
         raise ValidationError(detail="Неверный код")
 
-    user.is_active = True
+    user.email_verified = True
     user.save()
 
     create_profile(user)
