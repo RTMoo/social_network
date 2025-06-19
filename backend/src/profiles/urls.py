@@ -4,6 +4,11 @@ from profiles.views import get_profile_view, update_profile_view, get_my_profile
 
 urlpatterns = [
     path(
+        route="me/",
+        view=get_my_profile_view,
+        name="get_my_profile",
+    ),
+    path(
         route="<str:username>/",
         view=get_profile_view,
         name="get_profile",
@@ -12,10 +17,5 @@ urlpatterns = [
         route="me/update/",
         view=update_profile_view,
         name="update_profile",
-    ),
-    path(
-        route="me/",
-        view=get_my_profile_view,
-        name="get_my_profile",
     ),
 ]
