@@ -3,9 +3,7 @@ from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(
-        self, email, username, password=None, **extra_fields
-    ):
+    def create_user(self, email, username, password=None, **extra_fields):
         if not email:
             raise ValueError("Email обязателен")
         if not username:

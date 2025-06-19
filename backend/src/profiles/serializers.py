@@ -4,6 +4,8 @@ from django_countries.serializer_fields import CountryField
 
 
 class ProfileSerializer(serializers.Serializer):
+    username = serializers.CharField(read_only=True, source="user.username")
+    email = serializers.EmailField(read_only=True, source="user.email")
     first_name = serializers.CharField(max_length=32, allow_blank=True, required=False)
     last_name = serializers.CharField(max_length=32, allow_blank=True, required=False)
     avatar = serializers.ImageField(allow_null=True, required=False)
