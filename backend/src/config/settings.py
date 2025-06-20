@@ -136,8 +136,7 @@ SIMPLE_JWT = {
 }
 
 # CORS
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
 CORS_ALLOW_METHODS = ["GET", "POST", "PATCH", "DELETE"]
 CORS_ALLOW_HEADERS = ["Authorization", "Content-Type"]
 CORS_MAX_AGE = 600  # Кэшировать preflight на 10 минут
@@ -173,8 +172,3 @@ EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
-
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
