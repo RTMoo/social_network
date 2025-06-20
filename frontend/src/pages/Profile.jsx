@@ -37,6 +37,16 @@ export default function Profile() {
   if (error) return <div className="flex justify-center items-center min-h-screen text-red-500">{error}</div>;
   if (!profile) return null;
 
+  // Функция для форматирования даты в dd-mm-yyyy
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
   // Заглушки для статистики и постов
   const postsCount = profile.posts_count || 0;
   const followersCount = profile.followers_count || 0;
@@ -79,8 +89,8 @@ export default function Profile() {
       <div className="mb-8 text-center md:text-left">
         <div className="font-medium text-lg">{profile.first_name || ''} {profile.last_name || ''}</div>
         <div className="text-gray-700 whitespace-pre-line">{profile.bio || 'Нет описания'}</div>
-        <div className="text-gray-500 text-sm mt-2">{profile.country?.name ? `Страна: ${profile.country.name}` : ''}</div>
-        <div className="text-gray-500 text-sm">{profile.birth_date ? `Дата рождения: ${profile.birth_date}` : ''}</div>
+        <div className="text-gray-500 text-sm mt-2">{profile.country?.name ? `Страна: ${profile.country.name}` : 'Страна не указана'}</div>
+        <div className="text-gray-500 text-sm">{profile.birth_date ? `Дата рождения: ${formatDate(profile.birth_date)}` : ''}</div>
         <div className="text-gray-500 text-sm">{profile.email ? `Email: ${profile.email}` : ''}</div>
       </div>
       {/* Сетка публикаций */}

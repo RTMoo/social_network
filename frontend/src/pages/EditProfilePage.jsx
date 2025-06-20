@@ -45,10 +45,16 @@ export default function EditProfilePage() {
   if (error) return <div className="flex justify-center items-center min-h-screen text-red-500">{error}</div>;
   if (!profile) return null;
 
+  // Преобразуем country из объекта в строку-код
+  const initial = {
+    ...profile,
+    country: profile.country ? profile.country.code : 'null',
+  };
+
   return (
     <div className="max-w-xl mx-auto py-10 px-4">
       <h1 className="text-2xl font-bold mb-6">Редактировать профиль</h1>
-      <EditProfileForm initial={profile} onSuccess={handleSuccess} />
+      <EditProfileForm initial={initial} onSuccess={handleSuccess} />
     </div>
   );
 } 

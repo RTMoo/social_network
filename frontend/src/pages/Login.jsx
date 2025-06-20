@@ -22,7 +22,7 @@ export default function Login() {
     setError('');
     try {
       await authApi.login(data);
-      navigate('/');
+      navigate(0);
     } catch (e) {
       setError('Неверный email или пароль');
     }

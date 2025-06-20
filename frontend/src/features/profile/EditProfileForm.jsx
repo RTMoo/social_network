@@ -6,7 +6,7 @@ import { profilesApi } from '../../api';
 
 // Список стран (ISO 3166-1 alpha-2 + название)
 const COUNTRIES = [
-    { code: null, name: 'Не указано' },
+    { code: 'null', name: 'Не указано' },
     { code: 'RU', name: 'Россия' },
     { code: 'US', name: 'США' },
     { code: 'DE', name: 'Германия' },
@@ -27,11 +27,12 @@ const COUNTRIES = [
 const schema = yup.object().shape({
     first_name: yup.string().max(32, 'Максимум 32 символа'),
     last_name: yup.string().max(32, 'Максимум 32 символа'),
+    bio: yup.string().max(512, 'Максимум 512 символов'),
     country: yup
     .string()
     .nullable()
     .test('is-null-or-length-2', 'Выберите страну', value => {
-      return value === null || value.length === 2;
+      return value === 'null' || value.length === 2;
     }),
     birth_date: yup.date().nullable().typeError('Введите корректную дату'),
 });
@@ -47,11 +48,17 @@ export default function EditProfileForm({ initial, onSuccess }) {
     const onSubmit = async (data) => {
         setError('');
         setSuccess('');
+        // Преобразуем 'null' в null для country и форматируем дату
+        const sendData = {
+            ...data,
+            country: data.country === 'null' ? null : data.country,
+            birth_date: data.birth_date ? new Date(data.birth_date).toISOString().split('T')[0] : null,
+        };
         try {
-            await profilesApi.updateProfile(data);
+            await profilesApi.updateProfile(sendData);
             setSuccess('Профиль обновлён!');
             if (onSuccess) onSuccess();
-            reset(data);
+            reset(sendData);
         } catch (e) {
             console.log(e)
             setError('Ошибка при обновлении профиля');
@@ -72,6 +79,16 @@ export default function EditProfileForm({ initial, onSuccess }) {
                 <label className="block mb-1">Фамилия</label>
                 <input type="text" {...register('last_name')} className="w-full border px-3 py-2 rounded" />
                 {errors.last_name && <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>}
+            </div>
+            <div className="mb-4">
+                <label className="block mb-1">О себе</label>
+                <textarea 
+                    {...register('bio')} 
+                    className="w-full border px-3 py-2 rounded resize-none" 
+                    rows="3"
+                    placeholder="Расскажите о себе..."
+                />
+                {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>}
             </div>
             <div className="mb-4">
                 <label className="block mb-1">Страна</label>
