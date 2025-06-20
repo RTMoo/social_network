@@ -5,6 +5,8 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path("api/accounts/", include("accounts.urls")),
@@ -27,3 +29,4 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

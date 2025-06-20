@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { profilesApi } from '../api';
 import { AuthContext } from '../context/AuthContext';
@@ -9,6 +9,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { user } = useContext(AuthContext);
+  const avatarInputRef = useRef(null);
+
+  const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
   useEffect(() => {
     async function fetchProfile() {
@@ -25,6 +28,22 @@ export default function Profile() {
     }
     fetchProfile();
   }, [username]);
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      const res = await profilesApi.updateAvatar(formData);
+      setProfile(res.data); // Обновляем профиль с новым аватаром
+    } catch (err) {
+      setError('Ошибка при обновлении аватара');
+      console.error(err);
+    }
+  };
 
   const handleProfileUpdate = async () => {
     try {
@@ -57,11 +76,28 @@ export default function Profile() {
     <div className="max-w-3xl mx-auto py-10 px-4">
       {/* Верхняя часть: аватар, имя, статистика */}
       <div className="flex flex-col items-center md:flex-row md:items-start md:gap-12 mb-8">
-        <div className="flex-shrink-0 flex justify-center items-center w-36 h-36 rounded-full bg-gray-200 overflow-hidden border-4 border-gray-100 shadow">
+        <div 
+          className="relative group flex-shrink-0 flex justify-center items-center w-36 h-36 rounded-full bg-gray-200 overflow-hidden border-4 border-gray-100 shadow"
+          onClick={() => user?.username === username && avatarInputRef.current.click()}
+        >
           {profile.avatar ? (
-            <img src={profile.avatar} alt="avatar" className="w-full h-full object-cover" />
+            <img src={`${backendUrl}${profile.avatar}`} alt="avatar" className="w-full h-full object-cover" />
           ) : (
             <span className="text-6xl text-gray-400">👤</span>
+          )}
+          {user?.username === username && (
+            <>
+              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                <span className="text-white text-lg font-semibold">Изменить</span>
+              </div>
+              <input 
+                type="file" 
+                ref={avatarInputRef} 
+                onChange={handleAvatarChange} 
+                className="hidden"
+                accept="image/*"
+              />
+            </>
           )}
         </div>
         <div className="flex-1 mt-6 md:mt-0 w-full">

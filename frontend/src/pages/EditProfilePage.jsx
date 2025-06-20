@@ -11,6 +11,9 @@ export default function EditProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState(null);
+
+  const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
   useEffect(() => {
     async function fetchProfile() {
@@ -19,6 +22,9 @@ export default function EditProfilePage() {
       try {
         const res = await profilesApi.getProfile(username);
         setProfile(res.data);
+        if (res.data.avatar) {
+          setAvatarUrl(`${backendUrl}${res.data.avatar}`);
+        }
       } catch (e) {
         setError('Ошибка загрузки профиля');
       } finally {
@@ -31,7 +37,7 @@ export default function EditProfilePage() {
     } else {
       navigate(`/profile/${username}`);
     }
-  }, [username, user, navigate]);
+  }, [username, user, navigate, backendUrl]);
 
   if (user?.username !== username) {
     return null;
@@ -39,6 +45,10 @@ export default function EditProfilePage() {
 
   const handleSuccess = () => {
     navigate(`/profile/${username}`); // Перенаправляем на страницу профиля
+  };
+
+  const handleAvatarUpdate = (newAvatarPath) => {
+    setAvatarUrl(`${backendUrl}${newAvatarPath}`);
   };
 
   if (loading) return <div className="flex justify-center items-center min-h-screen">Загрузка...</div>;
@@ -54,7 +64,12 @@ export default function EditProfilePage() {
   return (
     <div className="max-w-xl mx-auto py-10 px-4">
       <h1 className="text-2xl font-bold mb-6">Редактировать профиль</h1>
-      <EditProfileForm initial={initial} onSuccess={handleSuccess} />
+      <EditProfileForm 
+        initial={initial} 
+        onSuccess={handleSuccess} 
+        avatarUrl={avatarUrl}
+        onAvatarUpdate={handleAvatarUpdate}
+      />
     </div>
   );
 } 
