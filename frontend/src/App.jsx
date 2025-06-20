@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ConfirmCode from './pages/ConfirmCode';
 import Profile from './pages/Profile';
+import EditProfilePage from './pages/EditProfilePage';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { useContext } from 'react';
 
@@ -19,6 +20,7 @@ function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/confirm" element={<ConfirmCode />} />
       <Route path="/profile/:username" element={<Profile />} />
+      <Route path="/profile/:username/edit" element={<EditProfilePage />} />
     </Routes>
   );
 }
