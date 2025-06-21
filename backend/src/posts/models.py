@@ -3,11 +3,14 @@ from django.db import models
 
 class Post(models.Model):
     author = models.ForeignKey(
-        to="accounts.CustomUser", on_delete=models.CASCADE, related_name="posts"
+        to="accounts.CustomUser",
+        on_delete=models.CASCADE,
+        related_name="posts",
     )
-    title = models.CharField(max_length=128)
-    content = models.TextField(max_length=2000)
-    image = models.ImageField(upload_to="posts/post_images/", blank=True, null=True)
+    title = models.CharField(max_length=128, null=True, blank=True)
+    content = models.TextField(max_length=2000, null=True, blank=True)
+    image = models.ImageField(upload_to="posts/original/")
+    preview = models.ImageField(upload_to="posts/preview/")
     likes_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

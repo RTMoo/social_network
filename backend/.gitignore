@@ -177,3 +177,4 @@ src/**/migrations/*
 
 !**/migrations/__init__.py
 media/
+.DS_Store
