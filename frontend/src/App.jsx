@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import ConfirmCode from './pages/ConfirmCode';
 import Profile from './pages/Profile';
 import EditProfilePage from './pages/EditProfilePage';
+import CreatePost from './pages/CreatePost';
 import MainLayout from './components/MainLayout';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/profile/:username" element={<Profile />} />
             <Route path="/profile/:username/edit" element={<EditProfilePage />} />
+            <Route path="/create" element={<CreatePost />} />
             {/* Другие маршруты внутри MainLayout */}
           </Routes>
         </MainLayout>

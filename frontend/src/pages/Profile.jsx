@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { profilesApi } from '../api';
+import { postsApi } from '../api';
 import { AuthContext } from '../context/AuthContext';
 
 export default function Profile() {
@@ -8,6 +9,8 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
   const { user } = useContext(AuthContext);
   const avatarInputRef = useRef(null);
 
@@ -26,8 +29,26 @@ export default function Profile() {
         setLoading(false);
       }
     }
-    fetchProfile();
-  }, [username]);
+
+    async function fetchPosts() {
+      setPostsLoading(true);
+      try {
+        const res = await postsApi.getUserPosts(username);
+        setPosts(res.data);
+      } catch (e) {
+        console.error('Ошибка загрузки постов:', e);
+      } finally {
+        setPostsLoading(false);
+      }
+    }
+
+    if (user?.username === username) {
+      fetchProfile();
+    } else {
+      fetchProfile();
+    }
+    fetchPosts();
+  }, [username, user, backendUrl]);
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
@@ -66,11 +87,10 @@ export default function Profile() {
     return `${day}-${month}-${year}`;
   };
 
-  // Заглушки для статистики и постов
-  const postsCount = profile.posts_count || 0;
+  // Заглушки для статистики
+  const postsCount = posts.length;
   const followersCount = profile.followers_count || 0;
   const followingCount = profile.following_count || 0;
-  const posts = profile.posts || Array(9).fill({}); // Плейсхолдеры
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
@@ -132,18 +152,34 @@ export default function Profile() {
       {/* Сетка публикаций */}
       <div>
         <div className="border-t border-gray-200 mb-4" />
-        <div className="grid grid-cols-3 gap-2 md:gap-4">
-          {posts.map((post, idx) => (
-            <div key={idx} className="aspect-square bg-gray-100 flex items-center justify-center rounded-md overflow-hidden">
-              {/* Здесь будет картинка поста, если есть */}
-              {post.image ? (
-                <img src={post.image} alt="post" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-3xl text-gray-300">📷</span>
-              )}
-            </div>
-          ))}
-        </div>
+        {postsLoading ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="text-gray-500">Загрузка постов...</div>
+          </div>
+        ) : posts.length > 0 ? (
+          <div className="grid grid-cols-3 gap-2 md:gap-4">
+            {posts.map((post) => (
+              <div key={post.id} className="aspect-square bg-gray-100 rounded-md overflow-hidden">
+                {post.preview ? (
+                  <img 
+                    src={`${backendUrl}${post.preview}`} 
+                    alt={post.title || 'Post'} 
+                    className="w-full h-full object-cover hover:opacity-90 transition-opacity cursor-pointer"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-3xl text-gray-300">📷</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            <span className="text-4xl mb-4 block">📷</span>
+            <p>Пока нет публикаций</p>
+          </div>
+        )}
       </div>
     </div>
   );

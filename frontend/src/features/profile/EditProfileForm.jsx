@@ -261,7 +261,7 @@ const COUNTRIES = [
 const schema = yup.object().shape({
     first_name: yup.string().max(32, 'Максимум 32 символа'),
     last_name: yup.string().max(32, 'Максимум 32 символа'),
-    bio: yup.string().max(512, 'Максимум 512 символов'),
+    bio: yup.string().max(512, 'Максимум 512 символов').nullable(),
     country: yup
     .string()
     .nullable()
@@ -307,7 +307,21 @@ export default function EditProfileForm({ initial, onSuccess, avatarUrl, onAvata
         const sendData = {
             ...restData,
             country: restData.country === 'null' ? null : restData.country,
-            birth_date: restData.birth_date ? new Date(restData.birth_date).toISOString().split('T')[0] : null,
+            birth_date: restData.birth_date ? (() => {
+                // Проверяем, что birth_date это строка
+                if (typeof restData.birth_date === 'string') {
+                    const [year, month, day] = restData.birth_date.split('-');
+                    return `${year}-${month}-${day}`;
+                }
+                // Если это объект Date, форматируем его
+                if (restData.birth_date instanceof Date) {
+                    const year = restData.birth_date.getFullYear();
+                    const month = String(restData.birth_date.getMonth() + 1).padStart(2, '0');
+                    const day = String(restData.birth_date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+                return restData.birth_date;
+            })() : null,
         };
         try {
             await profilesApi.updateProfile(sendData);
