@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { profilesApi } from '../api';
 import { postsApi } from '../api';
 import { AuthContext } from '../context/AuthContext';
+import PostModal from '../components/PostModal';
 
 export default function Profile() {
   const { username } = useParams();
@@ -11,6 +12,8 @@ export default function Profile() {
   const [error, setError] = useState('');
   const [posts, setPosts] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useContext(AuthContext);
   const avatarInputRef = useRef(null);
 
@@ -71,6 +74,16 @@ export default function Profile() {
       const res = await profilesApi.getProfile(username);
       setProfile(res.data);
     } catch {}
+  };
+
+  const handlePostClick = (post) => {
+    setSelectedPost(post);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
   };
 
   if (loading) return <div className="flex justify-center items-center min-h-screen">Загрузка...</div>;
@@ -159,12 +172,16 @@ export default function Profile() {
         ) : posts.length > 0 ? (
           <div className="grid grid-cols-3 gap-2 md:gap-4">
             {posts.map((post) => (
-              <div key={post.id} className="aspect-square bg-gray-100 rounded-md overflow-hidden">
+              <div 
+                key={post.id} 
+                className="aspect-square bg-gray-100 rounded-md overflow-hidden cursor-pointer"
+                onClick={() => handlePostClick(post)}
+              >
                 {post.preview ? (
                   <img 
                     src={`${backendUrl}${post.preview}`} 
                     alt={post.title || 'Post'} 
-                    className="w-full h-full object-cover hover:opacity-90 transition-opacity cursor-pointer"
+                    className="w-full h-full object-cover hover:opacity-90 transition-opacity"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
@@ -181,6 +198,14 @@ export default function Profile() {
           </div>
         )}
       </div>
+
+      {/* Модальное окно поста */}
+      <PostModal
+        post={selectedPost}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        backendUrl={backendUrl}
+      />
     </div>
   );
 } 

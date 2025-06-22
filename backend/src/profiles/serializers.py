@@ -9,7 +9,9 @@ class ProfileSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=32, required=False)
     last_name = serializers.CharField(max_length=32, required=False)
     avatar = serializers.ImageField(required=False, allow_null=True)
-    bio = serializers.CharField(max_length=512, required=False, allow_null=True, allow_blank=True)
+    bio = serializers.CharField(
+        max_length=512, required=False, allow_null=True, allow_blank=True
+    )
     birth_date = serializers.DateField(required=False, allow_null=True)
     country = CountryField(country_dict=True, required=False, allow_null=True)
 
