@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { commentsApi } from '../api';
+import React, { useState, useEffect } from 'react';
+import { commentsApi, likesApi } from '../api';
 
 export default function CommentList({ comments, onReply, currentUser, onDelete, onEdit, loading, level = 0 }) {
   const [replyTo, setReplyTo] = useState(null);
@@ -8,6 +8,20 @@ export default function CommentList({ comments, onReply, currentUser, onDelete, 
   const [openReplies, setOpenReplies] = useState({});
   const [repliesCache, setRepliesCache] = useState({});
   const [repliesLoading, setRepliesLoading] = useState({});
+  const [commentLikes, setCommentLikes] = useState({});
+  const [likedByUser, setLikedByUser] = useState({});
+  const [likeLoading, setLikeLoading] = useState({});
+
+  useEffect(() => {
+    const likes = {};
+    const liked = {};
+    comments.forEach(comment => {
+      likes[comment.id] = comment.likes_count;
+      liked[comment.id] = comment.is_liked_by_user;
+    });
+    setCommentLikes(likes);
+    setLikedByUser(liked);
+  }, [comments]);
 
   const handleEdit = (comment) => {
     setEditId(comment.id);
@@ -48,6 +62,20 @@ export default function CommentList({ comments, onReply, currentUser, onDelete, 
     }
   };
 
+  const handleLikeComment = async (commentId) => {
+    if (likeLoading[commentId]) return;
+    setLikeLoading(prev => ({ ...prev, [commentId]: true }));
+    try {
+      await likesApi.likeComment(commentId);
+      setLikedByUser(prev => ({ ...prev, [commentId]: !prev[commentId] }));
+      setCommentLikes(prev => ({
+        ...prev,
+        [commentId]: prev[commentId] + (likedByUser[commentId] ? -1 : 1)
+      }));
+    } catch {}
+    setLikeLoading(prev => ({ ...prev, [commentId]: false }));
+  };
+
   return (
     <div className="flex flex-col gap-4">
       {comments.map(comment => {
@@ -60,9 +88,7 @@ export default function CommentList({ comments, onReply, currentUser, onDelete, 
             <div className="flex items-center gap-2 mb-1">
               <span className="font-semibold text-sm">{comment.author}</span>
               <span className="text-xs text-gray-400">{new Date(comment.created_at).toLocaleString('ru-RU')}</span>
-              {comment.likes_count > 0 && (
-                <span className="text-xs text-gray-500 ml-2">♥ {comment.likes_count}</span>
-              )}
+
             </div>
             {editId === comment.id ? (
               <form onSubmit={e => handleEditSubmit(e, comment)} className="flex gap-2 items-center">
@@ -77,7 +103,7 @@ export default function CommentList({ comments, onReply, currentUser, onDelete, 
                 <button type="button" className="text-gray-400 text-xs" onClick={() => setEditId(null)}>Отмена</button>
               </form>
             ) : (
-              <div className="text-sm whitespace-pre-line mb-1">{comment.text}</div>
+              <div className="text-sm whitespace-pre-line mb-1 break-words break-all">{comment.text}</div>
             )}
             <div className="flex gap-2 text-xs text-gray-500">
               <button type="button" onClick={() => setReplyTo(comment.id)} className="hover:underline">Ответить</button>
@@ -98,6 +124,24 @@ export default function CommentList({ comments, onReply, currentUser, onDelete, 
                   {isOpen ? 'Скрыть ответы' : `Ответы${hasReplies ? ` (${replies.length})` : ''}`}
                 </button>
               )}
+              {/* Кнопка лайка */}
+              <button
+                type="button"
+                className="ml-2 focus:outline-none"
+                onClick={() => handleLikeComment(comment.id)}
+                disabled={likeLoading[comment.id]}
+                title={likedByUser[comment.id] ? "Убрать лайк" : "Поставить лайк"}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className={`w-5 h-5 hover:scale-110 transition-transform inline ${likedByUser[comment.id] ? 'text-red-400' : 'text-gray-400'}`}
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                <span className="ml-1">{commentLikes[comment.id] ?? 0}</span>
+              </button>
             </div>
             {/* Ответы */}
             {isOpen && (

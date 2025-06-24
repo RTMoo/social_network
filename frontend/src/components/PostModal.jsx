@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { commentsApi } from '../api';
+import { commentsApi, postsApi, likesApi } from '../api';
 import CommentList from './CommentList';
 import CommentForm from './CommentForm';
 
@@ -10,13 +10,18 @@ export default function PostModal({ post, isOpen, onClose, backendUrl }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [replyTo, setReplyTo] = useState(null);
+  const [postLikes, setPostLikes] = useState(post?.likes_count || 0);
+  const [likeLoading, setLikeLoading] = useState(false);
+  const [likedByUser, setLikedByUser] = useState(!!post?.is_liked_by_user);
 
   useEffect(() => {
     if (isOpen && post?.id) {
       fetchComments();
     }
+    setPostLikes(post?.likes_count || 0);
+    setLikedByUser(!!post?.is_liked_by_user);
     // eslint-disable-next-line
-  }, [isOpen, post?.id]);
+  }, [isOpen, post?.id, post?.is_liked_by_user]);
 
   const fetchComments = async () => {
     setLoading(true);
@@ -113,6 +118,17 @@ export default function PostModal({ post, isOpen, onClose, backendUrl }) {
     };
   }, [isOpen, onClose]);
 
+  const handleLikePost = async () => {
+    if (!post?.id || likeLoading) return;
+    setLikeLoading(true);
+    try {
+      await likesApi.likePost(post.id);
+      setLikedByUser(prev => !prev);
+      setPostLikes(prev => prev + (likedByUser ? -1 : 1));
+    } catch {}
+    setLikeLoading(false);
+  };
+
   if (!isOpen || !post) return null;
 
   return (
@@ -156,7 +172,24 @@ export default function PostModal({ post, isOpen, onClose, backendUrl }) {
             <div className="text-sm text-gray-500 border-t pt-2">
               <div className="flex justify-between items-center">
                 <span>Автор: {post.author}</span>
-                <span>Лайков: {post.likes_count || 0}</span>
+                <span className="flex items-center gap-1">
+                  <button
+                    onClick={handleLikePost}
+                    className="focus:outline-none"
+                    disabled={likeLoading}
+                    title={likedByUser ? "Убрать лайк" : "Поставить лайк"}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className={`w-6 h-6 hover:scale-110 transition-transform ${likedByUser ? 'text-red-500' : 'text-gray-400'}`}
+                    >
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                  </button>
+                  <span>{postLikes}</span>
+                </span>
               </div>
               {post.created_at && (
                 <div className="mt-2">
