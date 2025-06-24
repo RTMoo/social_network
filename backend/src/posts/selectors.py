@@ -5,7 +5,8 @@ from subscriptions.selectors import get_user_subscriptions
 
 def get_user_posts(username: str):
     posts = (
-        Post.objects.filter(author__username=username).select_related("author").all()
+        Post.objects.filter(
+            author__username=username).select_related("author").all()
     )
 
     return posts
@@ -30,3 +31,7 @@ def get_subscription_posts(username: str):
     )
 
     return posts
+
+
+def get_all_posts():
+    return Post.objects.select_related("author").all()

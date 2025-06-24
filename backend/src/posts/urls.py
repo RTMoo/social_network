@@ -6,6 +6,7 @@ from posts.views import (
     update_post_view,
     delete_post_view,
     get_subscribtion_posts_view,
+    get_all_posts_view,
 )
 
 
@@ -39,5 +40,10 @@ urlpatterns = [
         route="subscriptions_posts/",
         view=get_subscribtion_posts_view,
         name="subscriptions_posts",
+    ),
+    path(
+        route="all/",
+        view=get_all_posts_view,
+        name="get_all_posts",
     ),
 ]
