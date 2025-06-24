@@ -6,7 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema
 from posts.serializers import PostSerializer
 from posts.services import create_post, update_post, delete_post
-from posts.selectors import get_user_posts, get_post, get_subscription_posts, get_all_posts
+from posts.selectors import (
+    get_user_posts,
+    get_post,
+    get_subscription_posts,
+    get_all_posts,
+)
 
 
 @extend_schema(

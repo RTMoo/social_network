@@ -53,31 +53,3 @@ def like_comment(comment_id: int, sender: CustomUser) -> dict[str, bool]:
         change_likes_count(obj=comment, increment=True)
 
         return {"liked": True}
-
-
-def like_object(data: dict[str, Any], sender: CustomUser) -> None:
-    post_id = data.get("post_id")
-    comment_id = data.get("comment_id")
-
-    if post_id is not None:
-        post = get_post(post_id=post_id)
-
-        liked_post = Like.objects.filter(post_id=post_id, user=sender).first()
-        if liked_post:
-            liked_post.delete()
-            change_likes_count(obj=post, increment=False)
-
-        else:
-            Like.objects.create(post=post, user=sender)
-            change_likes_count(obj=post, increment=True)
-
-    else:
-        comment = get_comment(comment_id=comment_id)
-
-        liked_comment = Like.objects.filter(comment_id=comment_id, user=sender).first()
-        if liked_comment:
-            liked_comment.delete()
-            change_likes_count(obj=comment, increment=False)
-        else:
-            Like.objects.create(comment=comment, user=sender)
-            change_likes_count(obj=comment, increment=True)
