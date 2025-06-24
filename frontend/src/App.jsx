@@ -32,8 +32,8 @@ function App() {
     <>
       {showLayout ? (
         <MainLayout>
-          <Routes>
-            <Route path="/" element={<Home />} />
+    <Routes>
+      <Route path="/" element={<Home />} />
             <Route path="/profile/:username" element={<Profile />} />
             <Route path="/profile/:username/edit" element={<EditProfilePage />} />
             <Route path="/create" element={<CreatePost />} />
@@ -42,12 +42,12 @@ function App() {
         </MainLayout>
       ) : (
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
           <Route path="/confirm-code" element={<ConfirmCode />} />
           {/* Если пользователь не авторизован и пытается зайти на другие страницы, можно добавить редирект на /login */}
           <Route path="*" element={user ? <Home/> : <Login/>} />
-        </Routes>
+    </Routes>
       )}
     </>
   );
@@ -56,9 +56,9 @@ function App() {
 export default function AppWrapper() {
   return (
     <Router>
-      <AuthProvider>
+    <AuthProvider>
         <App />
       </AuthProvider>
-    </Router>
+      </Router>
   );
 }

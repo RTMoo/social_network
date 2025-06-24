@@ -11,3 +11,4 @@ export const getPost = (postId) => api.get(`/posts/get/${postId}/`);
 export const updatePost = (postId, data) => api.patch(`/posts/update/${postId}/`, data);
 export const deletePost = (postId) => api.delete(`/posts/delete/${postId}/`);
 export const getSubscriptionPosts = () => api.get('/posts/subscriptions_posts/');
+export const getAllPosts = () => api.get('/posts/all/');
