@@ -1,5 +1,7 @@
 from rest_framework.exceptions import NotFound
 from comments.models import Comment
+from likes.models import Like
+from accounts.models import CustomUser
 
 
 def get_comment(comment_id: int) -> Comment:
@@ -28,7 +30,7 @@ def get_comment(comment_id: int) -> Comment:
     return comment
 
 
-def get_post_comments(post_id: int):
+def get_post_comments(post_id: int, user: CustomUser):
     """
     Возвращает все комментарии к посту.
 
@@ -39,12 +41,25 @@ def get_post_comments(post_id: int):
         Queryset[Comment] - комментарии
     """
 
-    return Comment.objects.filter(post_id=post_id, thread__isnull=True).select_related(
-        "author"
+    comments = Comment.objects.filter(
+        post_id=post_id, thread__isnull=True
+    ).select_related("author")
+
+    comment_ids = [c.id for c in comments]
+
+    liked_ids = set(
+        Like.objects.filter(user=user, comment_id__in=comment_ids).values_list(
+            "comment_id", flat=True
+        )
     )
 
+    for comment in comments:
+        comment.is_liked_by_user = comment.id in liked_ids
 
-def get_comment_replies(comment_id: int):
+    return comments
+
+
+def get_comment_replies(comment_id: int, user: CustomUser):
     """
     Возвращает все ответы к комментарию.
 
@@ -55,9 +70,20 @@ def get_comment_replies(comment_id: int):
         Queryset[Comment] - ответы
     """
 
-    return Comment.objects.filter(thread_id=comment_id).select_related(
+    replies = Comment.objects.filter(thread_id=comment_id).select_related(
         "author", "reply_to", "reply_to_author"
     )
+
+    reply_ids = [c.id for c in replies]
+    liked_ids = set(
+        Like.objects.filter(user=user, comment_id__in=reply_ids).values_list(
+            "comment_id", flat=True
+        )
+    )
+    for reply in replies:
+        reply.is_liked_by_user = reply.id in liked_ids
+
+    return replies
 
 
 def get_user_comments(username: str):

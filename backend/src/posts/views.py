@@ -49,10 +49,8 @@ def get_user_posts_view(request: Request, username: str):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_post_view(request: Request, post_id: int):
-    post = get_post(post_id=post_id)
-
+    post = get_post(post_id=post_id, user=request.user)
     data = PostSerializer(instance=post).data
-
     return Response(data=data, status=status.HTTP_200_OK)
 
 
@@ -94,6 +92,6 @@ def get_subscribtion_posts_view(request: Request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_all_posts_view(request: Request):
-    posts = get_all_posts()
+    posts = get_all_posts(user=request.user)
     data = PostSerializer(instance=posts, many=True).data
     return Response(data=data, status=status.HTTP_200_OK)

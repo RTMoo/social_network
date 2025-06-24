@@ -12,6 +12,7 @@ class CommentSerializer(serializers.Serializer):
     likes_count = serializers.IntegerField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
+    is_liked_by_user = serializers.BooleanField(read_only=True)
 
 
 class CommentUpdateSerializer(serializers.Serializer):

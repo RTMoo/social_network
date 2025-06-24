@@ -32,7 +32,7 @@ def create_comment_view(request: Request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_post_comments_view(request: Request, post_id: int):
-    comments = get_post_comments(post_id=post_id)
+    comments = get_post_comments(post_id=post_id, user=request.user)
 
     data = CommentSerializer(instance=comments, many=True).data
 
@@ -45,7 +45,7 @@ def get_post_comments_view(request: Request, post_id: int):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_comment_replies_view(request: Request, comment_id: int):
-    replies = get_comment_replies(comment_id=comment_id)
+    replies = get_comment_replies(comment_id=comment_id, user=request.user)
 
     data = CommentSerializer(instance=replies, many=True).data
 
