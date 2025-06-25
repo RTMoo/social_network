@@ -4,6 +4,7 @@ import { profilesApi } from '../api';
 import { postsApi } from '../api';
 import { AuthContext } from '../context/AuthContext';
 import PostModal from '../components/PostModal';
+import SubscriptionsModal from '../components/SubscriptionsModal';
 import * as subscriptionsApi from '../api/endpoints/subscriptions';
 
 export default function Profile() {
@@ -19,6 +20,9 @@ export default function Profile() {
   const avatarInputRef = useRef(null);
   const [subscribed, setSubscribed] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
+  const [subscriptionsModalOpen, setSubscriptionsModalOpen] = useState(false);
+  const [subscribersModalOpen, setSubscribersModalOpen] = useState(false);
+  const [subscriptionsModalType, setSubscriptionsModalType] = useState('subscriptions');
 
   const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
@@ -107,6 +111,24 @@ export default function Profile() {
     }
   };
 
+  const handleOpenSubscriptions = () => {
+    setSubscriptionsModalType('subscriptions');
+    setSubscriptionsModalOpen(true);
+  };
+
+  const handleOpenSubscribers = () => {
+    setSubscriptionsModalType('subscribers');
+    setSubscribersModalOpen(true);
+  };
+
+  const handleCloseSubscriptionsModal = () => {
+    setSubscriptionsModalOpen(false);
+  };
+
+  const handleCloseSubscribersModal = () => {
+    setSubscribersModalOpen(false);
+  };
+
   if (loading) return <div className="flex justify-center items-center min-h-screen">Загрузка...</div>;
   if (error) return <div className="flex justify-center items-center min-h-screen text-red-500">{error}</div>;
   if (!profile) return null;
@@ -180,8 +202,20 @@ export default function Profile() {
           </div>
           <div className="flex justify-center md:justify-start gap-8 mb-4">
             <div className="text-center"><span className="font-bold">{postsCount}</span><div className="text-xs text-gray-500">публикаций</div></div>
-            <div className="text-center"><span className="font-bold">{subscribersCount}</span><div className="text-xs text-gray-500">подписчиков</div></div>
-            <div className="text-center"><span className="font-bold">{subscriptionsCount}</span><div className="text-xs text-gray-500">подписок</div></div>
+            <button 
+              onClick={handleOpenSubscribers}
+              className="text-center hover:opacity-70 transition-opacity cursor-pointer"
+            >
+              <span className="font-bold">{subscribersCount}</span>
+              <div className="text-xs text-gray-500">подписчиков</div>
+            </button>
+            <button 
+              onClick={handleOpenSubscriptions}
+              className="text-center hover:opacity-70 transition-opacity cursor-pointer"
+            >
+              <span className="font-bold">{subscriptionsCount}</span>
+              <div className="text-xs text-gray-500">подписок</div>
+            </button>
           </div>
         </div>
       </div>
@@ -238,6 +272,24 @@ export default function Profile() {
         backendUrl={backendUrl}
         setPosts={setPosts}
         posts={posts}
+      />
+
+      {/* Модальное окно подписок */}
+      <SubscriptionsModal
+        isOpen={subscriptionsModalOpen}
+        onClose={handleCloseSubscriptionsModal}
+        username={username}
+        type="subscriptions"
+        backendUrl={backendUrl}
+      />
+
+      {/* Модальное окно подписчиков */}
+      <SubscriptionsModal
+        isOpen={subscribersModalOpen}
+        onClose={handleCloseSubscribersModal}
+        username={username}
+        type="subscribers"
+        backendUrl={backendUrl}
       />
     </div>
   );
