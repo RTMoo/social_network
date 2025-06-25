@@ -4,6 +4,7 @@ from subscriptions.views import (
     SubscriptionsListView,
     SubscribersListView,
     UnsubscribeView,
+    DeleteSubscriberView,
 )
 
 urlpatterns = [
@@ -16,6 +17,11 @@ urlpatterns = [
         "unsubscribe/<str:username>/",
         UnsubscribeView.as_view(),
         name="unsubscribe",
+    ),
+    path(
+        "delete-subscriber/<str:username>/",
+        DeleteSubscriberView.as_view(),
+        name="delete-subscriber",
     ),
     path(
         "subscriptions/<str:username>/",

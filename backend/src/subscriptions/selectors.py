@@ -1,17 +1,16 @@
-from accounts.models import CustomUser
 from profiles.models import Profile
 from subscriptions.models import Subscription
 from rest_framework.exceptions import NotFound
 from typing import List
 
 
-def get_subscribe(sender: CustomUser, username: str) -> Subscription:
+def get_subscribe(subscriber: str, to_subscribe: str) -> Subscription:
     """
     Возвращает объект подписки.
 
     Args:
-        sender (CustomUser): Пользователь, который подписан.
-        username (str): Имя пользователя, на которого оформлена подписка.
+        subscriber (str): Имя пользователя, который подписан.
+        to_subscribe (str): Имя пользователя, на которого оформлена подписка.
 
     Returns:
         Subscription: Объект подписки.
@@ -21,8 +20,8 @@ def get_subscribe(sender: CustomUser, username: str) -> Subscription:
     """
 
     subscription = Subscription.objects.filter(
-        subscriber=sender,
-        to_subscribe__username=username,
+        subscriber__username=subscriber,
+        to_subscribe__username=to_subscribe,
     ).first()
 
     if not subscription:
@@ -31,12 +30,12 @@ def get_subscribe(sender: CustomUser, username: str) -> Subscription:
     return subscription
 
 
-def subscribe_exists(sender: CustomUser, username: str) -> bool:
+def subscribe_exists(subscriber: str, to_subscribe: str) -> bool:
     """
     Проверяет, существует ли подписка между двумя пользователями.
     """
     return Subscription.objects.filter(
-        subscriber=sender, to_subscribe__username=username
+        subscriber__username=subscriber, to_subscribe__username=to_subscribe
     ).exists()
 
 

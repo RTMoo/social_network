@@ -3,7 +3,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from subscriptions.services import subscribe, unsubscribe
+from subscriptions.services import subscribe, unsubscribe, delete_subscriber
 from subscriptions.selectors import get_user_subscriptions, get_user_subscribers
 from profiles.serializers import ProfileSerializer
 
@@ -22,6 +22,15 @@ class UnsubscribeView(APIView):
 
     def delete(self, request: Request, username: str):
         unsubscribe(sender=request.user, username=username)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DeleteSubscriberView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request: Request, username: str):
+        delete_subscriber(sender=request.user, username=username)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
