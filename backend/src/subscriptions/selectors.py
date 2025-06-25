@@ -1,4 +1,5 @@
 from accounts.models import CustomUser
+from profiles.models import Profile
 from subscriptions.models import Subscription
 from rest_framework.exceptions import NotFound
 from typing import List
@@ -39,35 +40,35 @@ def subscribe_exists(sender: CustomUser, username: str) -> bool:
     ).exists()
 
 
-def get_user_subscriptions(username: str) -> List[str]:
+def get_user_subscriptions(username: str) -> List[Profile]:
     """
-    Возвращает список username пользователей, на которых подписан переданный пользователь.
+    Возвращает список профилей пользователей, на которых подписан переданный пользователь.
 
     Args:
         username (str): Имя пользователя.
 
     Returns:
-        List[str]: Список username пользователей.
+        List[Profile]: Список профилей пользователей.
     """
 
     subscriptions = (
         Subscription.objects.filter(subscriber__username=username)
-        .select_related("to_subscribe")
+        .select_related("to_subscribe__profile")
         .all()
     )
 
-    return [subscribe.to_subscribe.username for subscribe in subscriptions]
+    return [subscribe.to_subscribe.profile for subscribe in subscriptions]
 
 
-def get_user_subscribers(username: str) -> List[str]:
+def get_user_subscribers(username: str) -> List[Profile]:
     """
-    Возвращает список username пользователей, которые подписаны на переданного пользователя.
+    Возвращает список профилей пользователей, которые подписаны на переданного пользователя.
 
     Args:
         username (str): Имя пользователя.
 
     Returns:
-        List[str]: Список username пользователей.
+        List[Profile]: Список профилей пользователей.
     """
 
     subscribers = (
@@ -76,4 +77,4 @@ def get_user_subscribers(username: str) -> List[str]:
         .all()
     )
 
-    return [subscribe.subscriber.username for subscribe in subscribers]
+    return [subscribe.subscriber.profile for subscribe in subscribers]

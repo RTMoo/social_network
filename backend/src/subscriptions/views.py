@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from subscriptions.services import subscribe, unsubscribe
 from subscriptions.selectors import get_user_subscriptions, get_user_subscribers
+from profiles.serializers import ProfileSerializer
 
 
 class SubscribeView(APIView):
@@ -30,8 +31,9 @@ class SubscriptionsListView(APIView):
 
     def get(self, request: Request, username: str):
         subscriptions = get_user_subscriptions(username=username)
+        data = ProfileSerializer(instance=subscriptions, many=True).data
 
-        return Response(data=subscriptions, status=status.HTTP_200_OK)
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class SubscribersListView(APIView):
@@ -39,5 +41,6 @@ class SubscribersListView(APIView):
 
     def get(self, request: Request, username: str):
         subscribers = get_user_subscribers(username=username)
+        data = ProfileSerializer(instance=subscribers, many=True).data
 
-        return Response(data=subscribers, status=status.HTTP_200_OK)
+        return Response(data=data, status=status.HTTP_200_OK)

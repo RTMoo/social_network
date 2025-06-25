@@ -18,12 +18,12 @@ urlpatterns = [
         name="unsubscribe",
     ),
     path(
-        "<str:username>/subscription-list/",
+        "subscriptions/<str:username>/",
         SubscriptionsListView.as_view(),
         name="subscriptions",
     ),
     path(
-        "<str:username>/subscriber-list/",
+        "subscribers/<str:username>/",
         SubscribersListView.as_view(),
         name="subscribers",
     ),
