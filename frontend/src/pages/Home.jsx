@@ -79,6 +79,8 @@ export default function Home() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         backendUrl={backendUrl}
+        setPosts={setPosts}
+        posts={posts}
       />
     </div>
   );

@@ -205,6 +205,8 @@ export default function Profile() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         backendUrl={backendUrl}
+        setPosts={setPosts}
+        posts={posts}
       />
     </div>
   );
