@@ -25,7 +25,10 @@ def get_profile(username: str, sender: CustomUser) -> Profile:
         raise NotFound(detail="Профиль не найден.")
 
     if sender.is_authenticated:
-        profile.is_subscribed = subscribe_exists(subscriber=sender.username, to_subscribe=username)
+        profile.is_subscribed = subscribe_exists(
+            subscriber=sender.username,
+            to_subscribe=username,
+        )
     else:
         profile.is_subscribed = False
 
