@@ -8,6 +8,16 @@ from posts.utils import normalize_post_image, make_post_preview
 
 
 def create_post(data: dict[str, Any], author: CustomUser) -> Post:
+    """
+    Создает новый пост с изображением.
+
+    Args:
+        data (dict[str, Any]): Словарь с данными поста.
+        author (CustomUser): Автор поста.
+
+    Returns:
+        Post: Созданный пост.
+    """
     image = data.pop("image")
 
     # Нормализация изображения
@@ -28,6 +38,16 @@ def create_post(data: dict[str, Any], author: CustomUser) -> Post:
 
 
 def update_post(data: dict[str, Any], post_id: int) -> Post:
+    """
+    Обновляет существующий пост.
+
+    Args:
+        data (dict[str, Any]): Словарь с данными для обновления.
+        post_id (int): id поста, который нужно обновить.
+
+    Returns:
+        Post: Обновленный пост.
+    """
     post = get_post(post_id)
 
     for key, value in data.items():
@@ -39,6 +59,16 @@ def update_post(data: dict[str, Any], post_id: int) -> Post:
 
 
 def delete_post(post_id: int, author: CustomUser) -> None:
+    """
+    Удаляет существующий пост.
+
+    Args:
+        post_id (int): id поста, который нужно удалить.
+        author (CustomUser): Автор поста.
+
+    Raises:
+        PermissionDenied: Если пост не принадлежит автору.
+    """
     post = get_post(post_id)
 
     if post.author != author:

@@ -1,19 +1,19 @@
 from likes.models import Like
 from posts.models import Post
 from comments.models import Comment
+from typing import List
 
 
-def get_user_liked_posts(username: str) -> list[Post]:
+def get_user_liked_posts(username: str) -> List[Post]:
     """
-    Возвращает все лайки, поставленные пользователем с указанным именем к постам.
+    Возвращает все посты, которые лайкнул пользователь.
 
     Args:
-        username: str - имя пользователя
+        username (str): Имя пользователя.
 
     Returns:
-        list[Post]
+        List[Post]: Список постов, которые лайкнул пользователь.
     """
-
     likes = Like.objects.filter(
         user__username=username, post__isnull=False
     ).select_related("post__author")
@@ -21,17 +21,16 @@ def get_user_liked_posts(username: str) -> list[Post]:
     return [like.post for like in likes]
 
 
-def get_user_liked_comments(username: str) -> list[Comment]:
+def get_user_liked_comments(username: str) -> List[Comment]:
     """
-    Возвращает все лайки, поставленные пользователем с указанным именем к комментариям.
+    Возвращает все комментарии, которые лайкнул пользователь.
 
     Args:
-        username: str - имя пользователя
+        username (str): Имя пользователя.
 
     Returns:
-        list[Comment]
+        List[Comment]: Список комментариев, которые лайкнул пользователь.
     """
-
     likes = Like.objects.filter(
         user__username=username, comment__isnull=False
     ).select_related("comment__author")

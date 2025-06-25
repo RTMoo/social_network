@@ -14,25 +14,24 @@ def create_comment(
     Создает новый комментарий.
 
     Args:
-        data: dict со следующими полями:
-            post_id: int - id поста, к которомуعلقется комментарий
-            reply_to_id: int - id комментария, на который отвечаем (опционально)
-            text: str - текст комментария
-        author: CustomUser - автор комментария
+        data (dict[str, Any]): Словарь с данными комментария:
+            post_id (int): id поста, к которому относится комментарий.
+            reply_to_id (int, optional): id комментария, на который отвечаем.
+            text (str): текст комментария.
+        sender (CustomUser): Автор комментария.
 
     Returns:
-        Comment - созданный комментарий
+        Comment: Созданный комментарий.
+
+    Raises:
+        ValidationError: Если комментарий reply_to не принадлежит данному посту.
     """
-
     post = get_post(post_id=data.get("post_id"))
-
     thread = None
     reply_to_comment = None
     reply_to_author = None
-
     reply_to_id = data.get("reply_to_id")
 
-    # Проверяем reply_to (конкретный коммент, на который отвечаем)
     if reply_to_id is not None:
         reply_to_comment = get_comment(comment_id=reply_to_id)
         if reply_to_comment.post_id != post.id:
@@ -44,7 +43,6 @@ def create_comment(
             thread = reply_to_comment.thread
         else:
             thread = reply_to_comment
-        # храним модель CustomUser чтобы при удалении комментарии можно было узнать автора
         reply_to_author = reply_to_comment.author
 
     comment = Comment.objects.create(
@@ -68,18 +66,17 @@ def update_comment(
     Обновляет существующий комментарий.
 
     Args:
-        data: dict со следующими полями:
-            text: str - текст комментария
-        comment_id: int - id комментария, который нужно обновить
-        author: CustomUser - автор комментария
+        data (dict[str, Any]): Словарь с данными для обновления:
+            text (str): текст комментария.
+        comment_id (int): id комментария, который нужно обновить.
+        sender (CustomUser): Автор комментария.
 
     Returns:
-        Comment - обновленный комментарий
+        Comment: Обновленный комментарий.
 
     Raises:
-        PermissionDenied: если комментарий не принадлежит отправителю
+        PermissionDenied: Если комментарий не принадлежит отправителю.
     """
-
     comment = get_comment(comment_id=comment_id)
 
     if comment.author != sender:
@@ -96,13 +93,12 @@ def delete_comment(comment_id: int, sender: CustomUser) -> None:
     Удаляет существующий комментарий.
 
     Args:
-        comment_id: int - id комментария, который нужно удалить
-        author: CustomUser - автор комментария
+        comment_id (int): id комментария, который нужно удалить.
+        sender (CustomUser): Автор комментария.
 
     Raises:
-        PermissionDenied: если комментарий не принадлежит отправителю
+        PermissionDenied: Если комментарий не принадлежит отправителю.
     """
-
     comment = get_comment(comment_id=comment_id)
 
     if comment.author != sender:

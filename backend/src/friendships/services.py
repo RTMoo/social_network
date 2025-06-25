@@ -14,14 +14,9 @@ def send_friendship_request(
     """
     Создаёт запрос на дружбу от текущего пользователя к пользователю с username.
 
-    Проверки:
-    - Если пользователи уже друзья — ошибка.
-    - Если существует обратный запрос на дружбу — ошибка.
-    - Если запрос уже существует в этом направлении — IntegrityError, обрабатывается как ошибка.
-
     Args:
-        from_user (CustomUser): Пользователь, отправляющий запрос.
-        username: username получателя.
+        current_user (CustomUser): Пользователь, отправляющий запрос.
+        username (str): username получателя.
 
     Returns:
         FriendshipRequest: Созданный объект запроса на дружбу.
@@ -29,7 +24,6 @@ def send_friendship_request(
     Raises:
         ValidationError: Если запрос недопустим (дружба уже есть или запрос уже отправлен).
     """
-
     to_user = get_user(username=username)
 
     if current_user.username == username:
@@ -73,7 +67,7 @@ def accept_friendship_request(
 
     Args:
         to_user (CustomUser): Пользователь, принимающий запрос.
-        from_username (str): Username пользователя, отправившего запрос.
+        username (str): Username пользователя, отправившего запрос.
 
     Returns:
         Friendship: Объект дружбы между двумя пользователями.
@@ -82,7 +76,6 @@ def accept_friendship_request(
         ValidationError: Если дружба уже существует.
         NotFound: Если запрос не найден.
     """
-
     from_user = get_user(username=username)
     request = selectors.get_friendship_request(to_user=to_user, from_user=from_user)
 
@@ -107,12 +100,11 @@ def reject_friendship_request(
 
     Args:
         current_user (CustomUser): Пользователь, отклоняющий запрос.
-        other_username (str): Username второго пользователя.
+        username (str): Username второго пользователя.
 
     Raises:
         NotFound: Если запрос на дружбу не существует.
     """
-
     to_user = get_user(username=username)
     request = selectors.get_friendship_request_between(
         from_user=current_user, to_user=to_user
@@ -135,7 +127,6 @@ def delete_friendship(current_user: CustomUser, username: str) -> None:
     Raises:
         NotFound: Если дружба не существует.
     """
-
     to_user = get_user(username=username)
     friendship = selectors.get_friendship(user1=current_user, user2=to_user)
 

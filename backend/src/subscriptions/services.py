@@ -20,7 +20,6 @@ def subscribe(sender: CustomUser, username: str) -> None:
                         на самого себя или подписка уже существует.
         NotFound: Если пользователь с переданным username не найден.
     """
-
     if sender.username == username:
         raise ValidationError("Нельзя подписаться на самого себя.")
 
@@ -44,7 +43,6 @@ def unsubscribe(sender: CustomUser, username: str) -> None:
         ValidationError: Если пользователь пытается отписаться от самого себя.
         NotFound: Если подписка не найдена.
     """
-
     if sender.username == username:
         raise ValidationError("Нельзя отписаться от самого себя.")
 

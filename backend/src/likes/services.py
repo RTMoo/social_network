@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from likes.models import Like
 from likes.utils import change_likes_count
@@ -7,15 +7,17 @@ from posts.selectors import get_post
 from comments.selectors import get_comment
 
 
-def like_post(post_id: int, sender: CustomUser) -> dict[str, bool]:
+def like_post(post_id: int, sender: CustomUser) -> Dict[str, bool]:
     """
     Создает или удаляет лайк у поста.
 
     Args:
-        post_id: int - id поста
-        author: CustomUser - пользователь, который лайкнул
-    """
+        post_id (int): id поста.
+        sender (CustomUser): Пользователь, который лайкнул.
 
+    Returns:
+        Dict[str, bool]: Словарь с ключом "liked" и значением True/False.
+    """
     post = get_post(post_id=post_id)
 
     liked_post = Like.objects.filter(post_id=post_id, user=sender).first()
@@ -31,15 +33,17 @@ def like_post(post_id: int, sender: CustomUser) -> dict[str, bool]:
         return {"liked": True}
 
 
-def like_comment(comment_id: int, sender: CustomUser) -> dict[str, bool]:
+def like_comment(comment_id: int, sender: CustomUser) -> Dict[str, bool]:
     """
-    Создает или удаляет лайк у комментарии.
+    Создает или удаляет лайк у комментария.
 
     Args:
-        comment_id: int - id комментарий
-        author: CustomUser - пользователь, который лайкнул
-    """
+        comment_id (int): id комментария.
+        sender (CustomUser): Пользователь, который лайкнул.
 
+    Returns:
+        Dict[str, bool]: Словарь с ключом "liked" и значением True/False.
+    """
     comment = get_comment(comment_id=comment_id)
 
     liked_comment = Like.objects.filter(comment_id=comment_id, user=sender).first()

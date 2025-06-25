@@ -1,11 +1,22 @@
 from django.conf import settings
+from rest_framework.response import Response
+from typing import Optional
 
 
-def set_jwt_token(response, access_token: str, refresh_token: str = None):
+def set_jwt_token(
+    response: Response, access_token: str, refresh_token: Optional[str] = None
+) -> Response:
     """
-    Установка куки к ответу
-    """
+    Устанавливает access и refresh токены в куки ответа.
 
+    Args:
+        response (Response): Исходный HTTP-ответ.
+        access_token (str): Access JWT токен.
+        refresh_token (Optional[str], optional): Refresh JWT токен. По умолчанию None.
+
+    Returns:
+        Response: HTTP-ответ с установленными куки.
+    """
     response.set_cookie(
         key="access_token",
         value=access_token,

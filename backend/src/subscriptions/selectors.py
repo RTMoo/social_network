@@ -1,6 +1,7 @@
 from accounts.models import CustomUser
 from subscriptions.models import Subscription
 from rest_framework.exceptions import NotFound
+from typing import List
 
 
 def get_subscribe(sender: CustomUser, username: str) -> Subscription:
@@ -24,12 +25,12 @@ def get_subscribe(sender: CustomUser, username: str) -> Subscription:
     ).first()
 
     if not subscription:
-        raise NotFound(detail="Подписка не найдена.")
+        raise NotFound(detail="Подписка не найдена.")
 
     return subscription
 
 
-def get_user_subscriptions(username: str) -> list[str]:
+def get_user_subscriptions(username: str) -> List[str]:
     """
     Возвращает список username пользователей, на которых подписан переданный пользователь.
 
@@ -37,7 +38,7 @@ def get_user_subscriptions(username: str) -> list[str]:
         username (str): Имя пользователя.
 
     Returns:
-        list[str]: Список username пользователей.
+        List[str]: Список username пользователей.
     """
 
     subscriptions = (
@@ -49,7 +50,7 @@ def get_user_subscriptions(username: str) -> list[str]:
     return [subscribe.to_subscribe.username for subscribe in subscriptions]
 
 
-def get_user_subscribers(username: str) -> list[str]:
+def get_user_subscribers(username: str) -> List[str]:
     """
     Возвращает список username пользователей, которые подписаны на переданного пользователя.
 
@@ -57,7 +58,7 @@ def get_user_subscribers(username: str) -> list[str]:
         username (str): Имя пользователя.
 
     Returns:
-        list[str]: Список username пользователей.
+        List[str]: Список username пользователей.
     """
 
     subscribers = (

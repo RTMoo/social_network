@@ -1,9 +1,16 @@
 from django.db.models import Model
+from typing import List
 
 
-def sort_models(data: list[Model]) -> list[Model]:
+def sort_models(data: List[Model]) -> List[Model]:
     """
-    Приводит список моделей к порядку сортировки
+    Сортирует список моделей по их первичному ключу.
+
+    Args:
+        data (List[Model]): Список моделей для сортировки.
+
+    Returns:
+        List[Model]: Отсортированный список моделей.
     """
 
     return sorted(data, key=lambda x: x.pk)

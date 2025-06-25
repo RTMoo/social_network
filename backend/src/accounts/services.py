@@ -7,6 +7,18 @@ from profiles.services import create_profile
 
 
 def register_user(data: dict[str, Any]) -> None:
+    """
+    Регистрирует нового пользователя или обновляет существующего.
+
+    Args:
+        data (dict[str, Any]): Словарь с данными пользователя:
+            email (str): Email пользователя.
+            username (str): Имя пользователя.
+            password (str): Пароль пользователя.
+
+    Raises:
+        ValidationError: Если email уже используется подтвержденным пользователем.
+    """
     user = CustomUser.objects.filter(email=data["email"]).first()
     if user:
         if user.email_verified:
@@ -25,6 +37,18 @@ def register_user(data: dict[str, Any]) -> None:
 
 
 def confirm_code(data: dict[str, Any]) -> None:
+    """
+    Подтверждает email пользователя по коду.
+
+    Args:
+        data (dict[str, Any]): Словарь с данными:
+            email (str): Email пользователя.
+            code (str): Код подтверждения.
+
+    Raises:
+        NotFound: Если пользователь не найден.
+        ValidationError: Если почта уже подтверждена, код истек или неверный.
+    """
     email = data["email"]
     code = data["code"]
 

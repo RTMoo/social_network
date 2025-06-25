@@ -6,7 +6,13 @@ from django.conf import settings
 
 
 @shared_task
-def send_confirmation_email(email):
+def send_confirmation_email(email: str) -> None:
+    """
+    Отправляет код подтверждения на указанный email.
+
+    Args:
+        email (str): Email адрес для отправки кода подтверждения.
+    """
     code = str(randint(100000, 999999))
 
     send_mail(

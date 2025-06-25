@@ -15,10 +15,9 @@ def get_user(username: str) -> CustomUser:
     Raises:
         NotFound: Если пользователь не найден.
     """
-
     user = CustomUser.objects.filter(username=username).first()
 
     if not user:
-        raise NotFound(detail="Пользователь не найден.")
+        raise NotFound(detail="Пользователь не найден.")
 
     return user
