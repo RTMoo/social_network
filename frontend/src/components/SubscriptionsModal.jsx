@@ -7,11 +7,14 @@ export default function SubscriptionsModal({
   onClose, 
   username, 
   type, // 'subscriptions' или 'subscribers'
-  backendUrl 
+  backendUrl,
+  currentUser, // добавляем текущего пользователя для проверки прав
+  onSubscriptionChange // callback для уведомления об изменениях
 }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [actionLoading, setActionLoading] = useState({}); // для отслеживания загрузки действий
 
   useEffect(() => {
     if (isOpen && username) {
@@ -31,6 +34,47 @@ export default function SubscriptionsModal({
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUnsubscribe = async (targetUsername) => {
+    if (!window.confirm('Вы уверены, что хотите отписаться от этого пользователя?')) return;
+    
+    setActionLoading(prev => ({ ...prev, [targetUsername]: true }));
+    try {
+      await subscriptionsApi.unsubscribe(targetUsername);
+      // Обновляем список после отписки
+      await fetchUsers();
+      // Уведомляем родительский компонент об изменении
+      if (onSubscriptionChange) {
+        onSubscriptionChange();
+      }
+    } catch (e) {
+      setError('Ошибка при отписке');
+      console.error(e);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [targetUsername]: false }));
+    }
+  };
+
+  const handleRemoveSubscriber = async (targetUsername) => {
+    if (!window.confirm('Вы уверены, что хотите удалить этого подписчика?')) return;
+    
+    setActionLoading(prev => ({ ...prev, [targetUsername]: true }));
+    try {
+      // Используем специальный API для удаления подписчика
+      await subscriptionsApi.deleteSubscriber(targetUsername);
+      // Обновляем список после удаления
+      await fetchUsers();
+      // Уведомляем родительский компонент об изменении
+      if (onSubscriptionChange) {
+        onSubscriptionChange();
+      }
+    } catch (e) {
+      setError('Ошибка при удалении подписчика');
+      console.error(e);
+    } finally {
+      setActionLoading(prev => ({ ...prev, [targetUsername]: false }));
     }
   };
 
@@ -59,6 +103,7 @@ export default function SubscriptionsModal({
   if (!isOpen) return null;
 
   const title = type === 'subscriptions' ? 'Подписки' : 'Подписчики';
+  const isCurrentUserProfile = currentUser?.username === username;
 
   return (
     <div className="fixed inset-0 bg-[#00000099] flex items-center justify-center z-50 p-4" onClick={handleBackdropClick}>
@@ -85,37 +130,62 @@ export default function SubscriptionsModal({
           ) : users.length > 0 ? (
             <div className="p-4">
               {users.map((user) => (
-                <Link
-                  key={user.username}
-                  to={`/profile/${user.username}`}
-                  onClick={onClose}
-                  className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-                    {user.avatar ? (
-                      <img 
-                        src={`${backendUrl}${user.avatar}`} 
-                        alt={user.username} 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        👤
+                <div key={user.username} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <Link
+                    to={`/profile/${user.username}`}
+                    onClick={onClose}
+                    className="flex items-center gap-3 flex-1 min-w-0"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                      {user.avatar ? (
+                        <img 
+                          src={`${backendUrl}${user.avatar}`} 
+                          alt={user.username} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          👤
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 truncate">
+                        {user.first_name && user.last_name 
+                          ? `${user.first_name} ${user.last_name}` 
+                          : user.username
+                        }
                       </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-900 truncate">
-                      {user.first_name && user.last_name 
-                        ? `${user.first_name} ${user.last_name}` 
-                        : user.username
-                      }
+                      <div className="text-sm text-gray-500 truncate">
+                        @{user.username}
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-500 truncate">
-                      @{user.username}
+                  </Link>
+                  
+                  {/* Кнопки действий */}
+                  {currentUser && (
+                    <div className="flex-shrink-0">
+                      {type === 'subscriptions' && isCurrentUserProfile && (
+                        <button
+                          onClick={() => handleUnsubscribe(user.username)}
+                          disabled={actionLoading[user.username]}
+                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50"
+                        >
+                          {actionLoading[user.username] ? '...' : 'Отписаться'}
+                        </button>
+                      )}
+                      {type === 'subscribers' && isCurrentUserProfile && (
+                        <button
+                          onClick={() => handleRemoveSubscriber(user.username)}
+                          disabled={actionLoading[user.username]}
+                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50"
+                        >
+                          {actionLoading[user.username] ? '...' : 'Удалить'}
+                        </button>
+                      )}
                     </div>
-                  </div>
-                </Link>
+                  )}
+                </div>
               ))}
             </div>
           ) : (

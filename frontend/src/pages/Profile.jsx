@@ -129,6 +129,17 @@ export default function Profile() {
     setSubscribersModalOpen(false);
   };
 
+  const handleSubscriptionChange = async () => {
+    // Обновляем профиль для получения актуальной статистики
+    try {
+      const res = await profilesApi.getProfile(username);
+      setProfile(res.data);
+      setSubscribed(!!res.data.is_subscribed);
+    } catch (e) {
+      console.error('Ошибка обновления профиля:', e);
+    }
+  };
+
   if (loading) return <div className="flex justify-center items-center min-h-screen">Загрузка...</div>;
   if (error) return <div className="flex justify-center items-center min-h-screen text-red-500">{error}</div>;
   if (!profile) return null;
@@ -281,6 +292,8 @@ export default function Profile() {
         username={username}
         type="subscriptions"
         backendUrl={backendUrl}
+        currentUser={user}
+        onSubscriptionChange={handleSubscriptionChange}
       />
 
       {/* Модальное окно подписчиков */}
@@ -290,6 +303,8 @@ export default function Profile() {
         username={username}
         type="subscribers"
         backendUrl={backendUrl}
+        currentUser={user}
+        onSubscriptionChange={handleSubscriptionChange}
       />
     </div>
   );
