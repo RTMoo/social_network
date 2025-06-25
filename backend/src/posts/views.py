@@ -36,7 +36,7 @@ def create_post_view(request: Request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_user_posts_view(request: Request, username: str):
-    posts = get_user_posts(username=username)
+    posts = get_user_posts(username=username, current_user=request.user)
 
     data = PostSerializer(instance=posts, many=True).data
 

@@ -1,3 +1,5 @@
+from typing import List, Set
+
 from rest_framework.exceptions import NotFound
 from posts.models import Post
 from subscriptions.selectors import get_user_subscriptions
@@ -6,7 +8,32 @@ from accounts.models import CustomUser
 from django.db.models import QuerySet
 
 
-def get_user_posts(username: str) -> QuerySet:
+def get_user_liked_current_post_ids(
+    user: CustomUser,
+    posts: List[Post],
+) -> Set[int]:
+    """
+    Возвращает множество id постов, которые лайкнул пользователь.
+
+    Args:
+        user (CustomUser): Пользователь, для которого нужно получить лайкнутые посты.
+        posts (List[Post]): Список постов для проверки.
+
+    Returns:
+        Set[int]: Множество id постов, которые лайкнул пользователь.
+    """
+
+    post_ids = [post.id for post in posts]
+    liked_ids = set(
+        Like.objects.filter(user=user, post_id__in=post_ids).values_list(
+            "post_id", flat=True
+        )
+    )
+
+    return liked_ids
+
+
+def get_user_posts(username: str, current_user: CustomUser) -> QuerySet:
     """
     Возвращает все посты пользователя.
 
@@ -19,6 +46,10 @@ def get_user_posts(username: str) -> QuerySet:
     posts = (
         Post.objects.filter(author__username=username).select_related("author").all()
     )
+    liked_ids = get_user_liked_current_post_ids(user=current_user, posts=posts)
+
+    for post in posts:
+        post.is_liked_by_user = post.id in liked_ids
 
     return posts
 
@@ -76,12 +107,8 @@ def get_all_posts(user: CustomUser) -> QuerySet:
         QuerySet: Все посты с отметкой лайков.
     """
     posts = Post.objects.select_related("author").all()
-    post_ids = [p.id for p in posts]
-    liked_ids = set(
-        Like.objects.filter(user=user, post_id__in=post_ids).values_list(
-            "post_id", flat=True
-        )
-    )
+    liked_ids = get_user_liked_current_post_ids(user=user, posts=posts)
+
     for post in posts:
         post.is_liked_by_user = post.id in liked_ids
 
