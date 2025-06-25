@@ -3,6 +3,7 @@ from profiles.models import Profile
 from accounts.models import CustomUser
 from subscriptions.selectors import subscribe_exists
 
+
 def get_profile(username: str, sender: CustomUser) -> Profile:
     """
     Возвращает профиль пользователя по username.
@@ -23,7 +24,10 @@ def get_profile(username: str, sender: CustomUser) -> Profile:
     if not profile:
         raise NotFound(detail="Профиль не найден.")
 
-    profile.is_subscribed = subscribe_exists(sender=sender, username=username)
+    if sender.is_authenticated:
+        profile.is_subscribed = subscribe_exists(sender=sender, username=username)
+    else:
+        profile.is_subscribed = False
 
     return profile
 

@@ -24,7 +24,7 @@ def create_post_view(request: Request):
     serializer = PostSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    created_post = create_post(serializer.validated_data, author=request.user)
+    created_post = create_post(serializer.validated_data, sender=request.user)
     data = PostSerializer(instance=created_post).data
 
     return Response(data=data, status=status.HTTP_201_CREATED)
@@ -36,7 +36,7 @@ def create_post_view(request: Request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_user_posts_view(request: Request, username: str):
-    posts = get_user_posts(username=username, current_user=request.user)
+    posts = get_user_posts(username=username, sender=request.user)
 
     data = PostSerializer(instance=posts, many=True).data
 
@@ -49,7 +49,7 @@ def get_user_posts_view(request: Request, username: str):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_post_view(request: Request, post_id: int):
-    post = get_post(post_id=post_id, user=request.user)
+    post = get_post(post_id=post_id)
     data = PostSerializer(instance=post).data
     return Response(data=data, status=status.HTTP_200_OK)
 
@@ -74,7 +74,7 @@ def update_post_view(request: Request, post_id: int):
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def delete_post_view(request: Request, post_id: int):
-    delete_post(post_id=post_id, author=request.user)
+    delete_post(post_id=post_id, sender=request.user)
 
     return Response(status=status.HTTP_204_NO_CONTENT)
 

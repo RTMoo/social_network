@@ -15,6 +15,10 @@ class SubscribeView(APIView):
 
         return Response(status=status.HTTP_201_CREATED)
 
+
+class UnsubscribeView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def delete(self, request: Request, username: str):
         unsubscribe(sender=request.user, username=username)
 

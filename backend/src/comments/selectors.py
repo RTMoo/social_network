@@ -5,6 +5,7 @@ from likes.models import Like
 from accounts.models import CustomUser
 from django.db.models import QuerySet
 
+
 def get_user_liked_current_comment_ids(
     user: CustomUser,
     comments: List[Comment],

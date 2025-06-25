@@ -1,10 +1,11 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 
 from accounts.models import CustomUser
 from accounts.selectors import get_user
 from subscriptions.models import Subscription
 from subscriptions.selectors import get_subscribe
 from rest_framework.exceptions import ValidationError
+from subscriptions.utils import increment_subscribe_count, decrement_subscribe_count
 
 
 def subscribe(sender: CustomUser, username: str) -> None:
@@ -26,7 +27,9 @@ def subscribe(sender: CustomUser, username: str) -> None:
     to_subscribe = get_user(username=username)
 
     try:
-        Subscription.objects.create(subscriber=sender, to_subscribe=to_subscribe)
+        with transaction.atomic():
+            Subscription.objects.create(subscriber=sender, to_subscribe=to_subscribe)
+            increment_subscribe_count(sender=sender, to_subscribe=to_subscribe)
     except IntegrityError:
         raise ValidationError("Подписка уже существует.")
 
@@ -48,4 +51,8 @@ def unsubscribe(sender: CustomUser, username: str) -> None:
 
     subscription = get_subscribe(sender=sender, username=username)
 
-    subscription.delete()
+    to_subscribe = subscription.to_subscribe
+
+    with transaction.atomic():
+        subscription.delete()
+        decrement_subscribe_count(sender=sender, to_subscribe=to_subscribe)

@@ -97,6 +97,9 @@ export default function Profile() {
         await subscriptionsApi.subscribe(username);
         setSubscribed(true);
       }
+      // Обновляем профиль для получения актуальной статистики
+      const res = await profilesApi.getProfile(username);
+      setProfile(res.data);
     } catch (e) {
       // Можно добавить обработку ошибок
     } finally {
@@ -118,10 +121,10 @@ export default function Profile() {
     return `${day}-${month}-${year}`;
   };
 
-  // Заглушки для статистики
-  const postsCount = posts.length;
-  const followersCount = profile.followers_count || 0;
-  const followingCount = profile.following_count || 0;
+  // Статистика из профиля
+  const postsCount = profile.posts_count || 0;
+  const subscribersCount = profile.subscribers_count || 0;
+  const subscriptionsCount = profile.subscription_count || 0;
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
@@ -177,8 +180,8 @@ export default function Profile() {
           </div>
           <div className="flex justify-center md:justify-start gap-8 mb-4">
             <div className="text-center"><span className="font-bold">{postsCount}</span><div className="text-xs text-gray-500">публикаций</div></div>
-            <div className="text-center"><span className="font-bold">{followersCount}</span><div className="text-xs text-gray-500">подписчиков</div></div>
-            <div className="text-center"><span className="font-bold">{followingCount}</span><div className="text-xs text-gray-500">подписок</div></div>
+            <div className="text-center"><span className="font-bold">{subscribersCount}</span><div className="text-xs text-gray-500">подписчиков</div></div>
+            <div className="text-center"><span className="font-bold">{subscriptionsCount}</span><div className="text-xs text-gray-500">подписок</div></div>
           </div>
         </div>
       </div>

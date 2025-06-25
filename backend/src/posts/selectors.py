@@ -33,7 +33,7 @@ def get_user_liked_current_post_ids(
     return liked_ids
 
 
-def get_user_posts(username: str, current_user: CustomUser) -> QuerySet:
+def get_user_posts(username: str, sender: CustomUser) -> QuerySet:
     """
     Возвращает все посты пользователя.
 
@@ -46,7 +46,7 @@ def get_user_posts(username: str, current_user: CustomUser) -> QuerySet:
     posts = (
         Post.objects.filter(author__username=username).select_related("author").all()
     )
-    liked_ids = get_user_liked_current_post_ids(user=current_user, posts=posts)
+    liked_ids = get_user_liked_current_post_ids(user=sender, posts=posts)
 
     for post in posts:
         post.is_liked_by_user = post.id in liked_ids

@@ -2,6 +2,10 @@ from io import BytesIO
 from PIL import Image
 from django.core.files.base import ContentFile
 from typing import Tuple
+from django.db import transaction
+from django.db.models import F
+from accounts.models import CustomUser
+from profiles.models import Profile
 
 
 def normalize_post_image(
@@ -46,3 +50,19 @@ def make_post_preview(
     byte_io = BytesIO()
     img.save(byte_io, format="JPEG", quality=quality)
     return ContentFile(byte_io.getvalue())
+
+
+def increment_posts_count(user: CustomUser) -> None:
+    """
+    Увеличивает количество постов у пользователя.
+    """
+    with transaction.atomic():
+        Profile.objects.filter(user=user).update(posts_count=F("posts_count") + 1)
+
+
+def decrement_posts_count(user: CustomUser) -> None:
+    """
+    Уменьшает количество постов у пользователя.
+    """
+    with transaction.atomic():
+        Profile.objects.filter(user=user).update(posts_count=F("posts_count") - 1)

@@ -15,6 +15,9 @@ class ProfileSerializer(serializers.Serializer):
     birth_date = serializers.DateField(required=False, allow_null=True)
     country = CountryField(country_dict=True, required=False, allow_null=True)
     is_subscribed = serializers.BooleanField(read_only=True)
+    subscription_count = serializers.IntegerField(read_only=True)
+    subscribers_count = serializers.IntegerField(read_only=True)
+    posts_count = serializers.IntegerField(read_only=True)
 
     def validate_first_name(self, value):
         validate_min_length_if_not_empty("first_name", value)

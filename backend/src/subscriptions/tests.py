@@ -20,7 +20,12 @@ class SubscriptionsTestCase(APITestCase):
 
         self.client.force_authenticate(user=self.user)
 
-        self.url = reverse("subscribe", kwargs={"username": self.other_user.username})
+        self.subscribe_url = reverse(
+            "subscribe", kwargs={"username": self.other_user.username}
+        )
+        self.unsubscribe_url = reverse(
+            "unsubscribe", kwargs={"username": self.other_user.username}
+        )
 
     def test_create_subscription(self):
         """
@@ -31,10 +36,10 @@ class SubscriptionsTestCase(APITestCase):
         - повторная попытка создать ту же подписку возвращает ошибку (HTTP 400)
         """
 
-        response = self.client.post(self.url)
+        response = self.client.post(self.subscribe_url)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        response = self.client.post(self.url)
+        response = self.client.post(self.subscribe_url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_subscription(self):
@@ -46,9 +51,9 @@ class SubscriptionsTestCase(APITestCase):
         - повторная попытка удалить уже удалённую подписку возвращает ошибку (HTTP 404)
         """
 
-        self.client.post(self.url)
-        response = self.client.delete(self.url)
+        self.client.post(self.subscribe_url)
+        response = self.client.delete(self.unsubscribe_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        response = self.client.delete(self.url)
+        response = self.client.delete(self.unsubscribe_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

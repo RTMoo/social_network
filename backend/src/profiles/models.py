@@ -11,6 +11,9 @@ class Profile(models.Model):
     bio = models.TextField(max_length=512, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
+    subscription_count = models.IntegerField(default=0)
+    subscribers_count = models.IntegerField(default=0)
+    posts_count = models.IntegerField(default=0)
 
     def clean(self):
         validate_min_length_if_not_empty(
