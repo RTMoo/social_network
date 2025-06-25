@@ -1,15 +1,15 @@
 from rest_framework.exceptions import NotFound
 from profiles.models import Profile
 from accounts.models import CustomUser
+from subscriptions.selectors import subscribe_exists
 
-
-def get_profile(username: str) -> Profile:
+def get_profile(username: str, sender: CustomUser) -> Profile:
     """
     Возвращает профиль пользователя по username.
 
     Args:
         username (str): username пользователя.
-
+        sender (CustomUser): Пользователь, который запрашивает профиль.
     Returns:
         Profile: Профиль пользователя.
 
@@ -22,6 +22,8 @@ def get_profile(username: str) -> Profile:
 
     if not profile:
         raise NotFound(detail="Профиль не найден.")
+
+    profile.is_subscribed = subscribe_exists(sender=sender, username=username)
 
     return profile
 

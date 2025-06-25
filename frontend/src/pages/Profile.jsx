@@ -4,6 +4,7 @@ import { profilesApi } from '../api';
 import { postsApi } from '../api';
 import { AuthContext } from '../context/AuthContext';
 import PostModal from '../components/PostModal';
+import * as subscriptionsApi from '../api/endpoints/subscriptions';
 
 export default function Profile() {
   const { username } = useParams();
@@ -16,6 +17,8 @@ export default function Profile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useContext(AuthContext);
   const avatarInputRef = useRef(null);
+  const [subscribed, setSubscribed] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
 
   const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
@@ -26,6 +29,7 @@ export default function Profile() {
       try {
         const res = await profilesApi.getProfile(username);
         setProfile(res.data);
+        setSubscribed(!!res.data.is_subscribed);
       } catch (e) {
         setError('Профиль не найден');
       } finally {
@@ -45,11 +49,7 @@ export default function Profile() {
       }
     }
 
-    if (user?.username === username) {
-      fetchProfile();
-    } else {
-      fetchProfile();
-    }
+    fetchProfile();
     fetchPosts();
   }, [username, user, backendUrl]);
 
@@ -73,6 +73,7 @@ export default function Profile() {
     try {
       const res = await profilesApi.getProfile(username);
       setProfile(res.data);
+      setSubscribed(!!res.data.is_subscribed);
     } catch {}
   };
 
@@ -84,6 +85,23 @@ export default function Profile() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedPost(null);
+  };
+
+  const handleSubscribe = async () => {
+    setSubLoading(true);
+    try {
+      if (subscribed) {
+        await subscriptionsApi.unsubscribe(username);
+        setSubscribed(false);
+      } else {
+        await subscriptionsApi.subscribe(username);
+        setSubscribed(true);
+      }
+    } catch (e) {
+      // Можно добавить обработку ошибок
+    } finally {
+      setSubLoading(false);
+    }
   };
 
   if (loading) return <div className="flex justify-center items-center min-h-screen">Загрузка...</div>;
@@ -145,6 +163,16 @@ export default function Profile() {
                   Редактировать профиль
                 </Link>
               </div>
+            )}
+            {/* Кнопка подписки/отписки */}
+            {user && user.username !== username && (
+              <button
+                onClick={handleSubscribe}
+                disabled={subLoading}
+                className={`ml-0 md:ml-4 mt-2 md:mt-0 px-4 py-2 rounded font-bold transition-colors ${subscribed ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+              >
+                {subscribed ? 'Отписаться' : 'Подписаться'}
+              </button>
             )}
           </div>
           <div className="flex justify-center md:justify-start gap-8 mb-4">

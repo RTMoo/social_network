@@ -12,7 +12,7 @@ from profiles.services import update_profile
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_profile_view(request: Request, username: str):
-    profile = get_profile(username)
+    profile = get_profile(username=username, sender=request.user)
     data = ProfileSerializer(instance=profile).data
 
     return Response(data=data, status=status.HTTP_200_OK)

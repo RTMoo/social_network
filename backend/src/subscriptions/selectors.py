@@ -29,6 +29,13 @@ def get_subscribe(sender: CustomUser, username: str) -> Subscription:
 
     return subscription
 
+def subscribe_exists(sender: CustomUser, username: str) -> bool:
+    """
+    Проверяет, существует ли подписка между двумя пользователями.
+    """
+    return Subscription.objects.filter(
+        subscriber=sender, to_subscribe__username=username
+    ).exists()
 
 def get_user_subscriptions(username: str) -> List[str]:
     """
