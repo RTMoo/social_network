@@ -107,7 +107,7 @@ export default function SubscriptionsModal({
 
   return (
     <div className="fixed inset-0 bg-[#00000099] flex items-center justify-center z-50 p-4" onClick={handleBackdropClick}>
-      <div className="bg-white rounded-lg w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+      <div className="bg-white rounded-lg w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
         {/* Заголовок */}
         <div className="flex justify-between items-center p-4 border-b">
           <h3 className="text-lg font-semibold">{title}</h3>
@@ -130,13 +130,13 @@ export default function SubscriptionsModal({
           ) : users.length > 0 ? (
             <div className="p-4">
               {users.map((user) => (
-                <div key={user.username} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                <div key={user.username} className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-lg transition-colors">
                   <Link
                     to={`/profile/${user.username}`}
                     onClick={onClose}
-                    className="flex items-center gap-3 flex-1 min-w-0"
+                    className="flex items-center gap-4 flex-1 min-w-0"
                   >
-                    <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
                       {user.avatar ? (
                         <img 
                           src={`${backendUrl}${user.avatar}`} 
@@ -144,13 +144,13 @@ export default function SubscriptionsModal({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-xl">
                           👤
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 truncate">
+                      <div className="font-medium text-gray-900 truncate text-base">
                         {user.first_name && user.last_name 
                           ? `${user.first_name} ${user.last_name}` 
                           : user.username
@@ -169,7 +169,7 @@ export default function SubscriptionsModal({
                         <button
                           onClick={() => handleUnsubscribe(user.username)}
                           disabled={actionLoading[user.username]}
-                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50"
+                          className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50"
                         >
                           {actionLoading[user.username] ? '...' : 'Отписаться'}
                         </button>
@@ -178,7 +178,7 @@ export default function SubscriptionsModal({
                         <button
                           onClick={() => handleRemoveSubscriber(user.username)}
                           disabled={actionLoading[user.username]}
-                          className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50"
+                          className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors disabled:opacity-50"
                         >
                           {actionLoading[user.username] ? '...' : 'Удалить'}
                         </button>

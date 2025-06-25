@@ -39,29 +39,29 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto py-10 px-4">
+      <div className="max-w-6xl mx-auto py-10 px-4">
         <h1 className="text-3xl font-bold mb-8 text-center">Публикации</h1>
         {loading ? (
           <div className="flex justify-center items-center py-8">
             <div className="text-gray-500">Загрузка публикаций...</div>
           </div>
         ) : posts.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2 md:gap-4">
+          <div className="grid grid-cols-3 gap-4 md:gap-6">
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="aspect-square bg-gray-100 rounded-md overflow-hidden cursor-pointer"
+                className="aspect-square bg-gray-100 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
                 onClick={() => handlePostClick(post)}
               >
                 {post.preview ? (
                   <img
                     src={`${backendUrl}${post.preview}`}
                     alt={post.title || 'Post'}
-                    className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                    className="w-full h-full object-cover hover:opacity-90 transition-all duration-200 hover:scale-110"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-3xl text-gray-300">📷</span>
+                    <span className="text-6xl text-gray-300">📷</span>
                   </div>
                 )}
               </div>

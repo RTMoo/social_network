@@ -23,6 +23,7 @@ export default function Profile() {
   const [subscriptionsModalOpen, setSubscriptionsModalOpen] = useState(false);
   const [subscribersModalOpen, setSubscribersModalOpen] = useState(false);
   const [subscriptionsModalType, setSubscriptionsModalType] = useState('subscriptions');
+  const [imageLoading, setImageLoading] = useState({});
 
   const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
@@ -160,7 +161,7 @@ export default function Profile() {
   const subscriptionsCount = profile.subscription_count || 0;
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-4">
+    <div className="max-w-5xl mx-auto py-10 px-4">
       {/* Верхняя часть: аватар, имя, статистика */}
       <div className="flex flex-col items-center md:flex-row md:items-start md:gap-12 mb-8">
         <div 
@@ -246,22 +247,22 @@ export default function Profile() {
             <div className="text-gray-500">Загрузка постов...</div>
           </div>
         ) : posts.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2 md:gap-4">
+          <div className="grid grid-cols-3 gap-4 md:gap-6">
             {posts.map((post) => (
               <div 
                 key={post.id} 
-                className="aspect-square bg-gray-100 rounded-md overflow-hidden cursor-pointer"
+                className="aspect-square bg-gray-100 rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105"
                 onClick={() => handlePostClick(post)}
               >
                 {post.preview ? (
                   <img 
                     src={`${backendUrl}${post.preview}`} 
                     alt={post.title || 'Post'} 
-                    className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                    className="w-full h-full object-cover hover:opacity-90 transition-all duration-200 hover:scale-110"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-3xl text-gray-300">📷</span>
+                    <span className="text-6xl text-gray-300">📷</span>
                   </div>
                 )}
               </div>
