@@ -2,6 +2,7 @@ from rest_framework.exceptions import NotFound
 from profiles.models import Profile
 from accounts.models import CustomUser
 from subscriptions.selectors import subscribe_exists
+from friendships.selectors import friend_exists, friend_request_exists
 
 
 def get_profile(username: str, sender: CustomUser) -> Profile:
@@ -29,8 +30,22 @@ def get_profile(username: str, sender: CustomUser) -> Profile:
             subscriber=sender.username,
             to_subscribe=username,
         )
+
+        profile.is_friend = friend_exists(
+            user1=sender,
+            user2=profile.user,
+        )
+
+        if not profile.is_friend:
+            profile.friend_request_sent = friend_request_exists(
+                from_user=sender,
+                to_user=profile.user,
+            )
+
     else:
         profile.is_subscribed = False
+        profile.friend_request_sent = False
+        profile.is_friend = False
 
     return profile
 

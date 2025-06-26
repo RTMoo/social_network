@@ -4,6 +4,7 @@ from rest_framework.exceptions import NotFound
 from django.db.models import Q, QuerySet
 from accounts.models import CustomUser
 from typing import List, Optional
+from profiles.models import Profile
 
 
 def get_friendship_request(
@@ -52,6 +53,13 @@ def friend_exists(
     return Friendship.objects.filter(user1=user1, user2=user2).exists()
 
 
+def friend_request_exists(from_user: CustomUser, to_user: CustomUser) -> bool:
+    return FriendshipRequest.objects.filter(
+        from_user=from_user,
+        to_user=to_user,
+    ).exists()
+
+
 def get_friendship_request_between(
     from_user: CustomUser,
     to_user: CustomUser,
@@ -72,36 +80,36 @@ def get_friendship_request_between(
     ).first()
 
 
-def get_friendship_usernames(
+def get_user_friendships(
     username: str,
-) -> List[str]:
+) -> List[Profile]:
     """
-    Возвращает список username друзей пользователя.
+    Возвращает список дружб пользователя.
 
     Args:
         username (str): username пользователя.
 
     Returns:
-        List[str]: Список username друзей.
+        List[Friendship]: Список дружб.
     """
     friendships = Friendship.objects.filter(
         Q(user1__username=username) | Q(user2__username=username)
-    ).select_related(
-        "user1",
-        "user2",
-    )
+    ).select_related("user1__profile", "user2__profile")
 
-    return [
-        friend.user2.username
-        if friend.user1.username == username
-        else friend.user1.username
-        for friend in friendships
-    ]
+    profiles = []
+
+    for friend in friendships:
+        if friend.user1.username == username:
+            profiles.append(friend.user2.profile)
+        else:
+            profiles.append(friend.user1.profile)
+
+    return profiles
 
 
 def get_sent_friendship_requests(
     sender: CustomUser,
-) -> QuerySet[FriendshipRequest]:
+) -> List[FriendshipRequest]:
     """
     Возвращает запросы на дружбу отправленные пользователем.
 
@@ -109,12 +117,13 @@ def get_sent_friendship_requests(
         sender (CustomUser): Пользователь, отправивший запросы.
 
     Returns:
-        QuerySet[FriendshipRequest]: Запросы на дружбу.
+        List[FriendshipRequest]: Запросы на дружбу.
     """
-    return FriendshipRequest.objects.filter(from_user=sender).select_related(
-        "from_user",
-        "to_user",
+    requests = FriendshipRequest.objects.filter(from_user=sender).select_related(
+        "to_user__profile",
     )
+
+    return [request.to_user.profile for request in requests]
 
 
 def get_received_friendship_requests(

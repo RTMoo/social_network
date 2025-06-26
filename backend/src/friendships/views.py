@@ -8,6 +8,7 @@ from drf_spectacular.utils import extend_schema
 from friendships import services
 from friendships import selectors
 from friendships.serializers import FriendshipRequestSerializer
+from profiles.serializers import ProfileSerializer
 
 
 class FriendshipRequestSendView(APIView):
@@ -97,14 +98,15 @@ class FriendshipListView(APIView):
 
     @extend_schema(
         request=None,
-        responses=list[str],
+        responses=ProfileSerializer,
         summary="Получить список друзей",
         description="Возвращает список друзей.",
     )
     def get(self, request: Request, username: str):
-        friendships = selectors.get_friendship_usernames(username=username)
+        friendships = selectors.get_user_friendships(username=username)
+        data = ProfileSerializer(instance=friendships, many=True).data
 
-        return Response(data=friendships, status=status.HTTP_200_OK)
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class FriendshipSentRequestListView(APIView):
@@ -113,17 +115,16 @@ class FriendshipSentRequestListView(APIView):
     """
 
     permission_classes = [IsAuthenticated]
-    serializer_class = FriendshipRequestSerializer
 
     @extend_schema(
         request=None,
-        responses=FriendshipRequestSerializer,
+        responses=ProfileSerializer,
         summary="Список запросов на дружбу от текущего пользователя",
         description="Получить список запросов на дружбу отправленных пользователем",
     )
     def get(self, request: Request):
         friendships = selectors.get_sent_friendship_requests(sender=request.user)
-        data = self.serializer_class(instance=friendships, many=True).data
+        data = ProfileSerializer(instance=friendships, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)
 
