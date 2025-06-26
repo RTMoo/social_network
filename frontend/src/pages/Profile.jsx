@@ -6,6 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 import PostModal from '../components/PostModal';
 import SubscriptionsModal from '../components/SubscriptionsModal';
 import * as subscriptionsApi from '../api/endpoints/subscriptions';
+import * as friendshipsApi from '../api/endpoints/friendships';
 
 export default function Profile() {
   const { username } = useParams();
@@ -203,13 +204,37 @@ export default function Profile() {
             )}
             {/* Кнопка подписки/отписки */}
             {user && user.username !== username && (
-              <button
-                onClick={handleSubscribe}
-                disabled={subLoading}
-                className={`ml-0 md:ml-4 mt-2 md:mt-0 px-4 py-2 rounded font-bold transition-colors ${subscribed ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
-              >
-                {subscribed ? 'Отписаться' : 'Подписаться'}
-              </button>
+              <>
+                <button
+                  onClick={handleSubscribe}
+                  disabled={subLoading}
+                  className={`ml-0 md:ml-4 mt-2 md:mt-0 px-4 py-2 rounded font-bold transition-colors ${subscribed ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                >
+                  {subscribed ? 'Отписаться' : 'Подписаться'}
+                </button>
+                {/* Кнопки дружбы */}
+                {profile.is_friend ? (
+                  <span className="ml-4 mt-2 md:mt-0 px-4 py-2 rounded font-bold bg-green-100 text-green-700">Ваш друг</span>
+                ) : profile.friend_request_sent ? (
+                  <span className="ml-4 mt-2 md:mt-0 px-4 py-2 rounded font-bold bg-yellow-100 text-yellow-700">Ожидание принятия</span>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      try {
+                        await friendshipsApi.sendFriendRequest(username);
+                        // Обновить профиль для отображения статуса
+                        const res = await profilesApi.getProfile(username);
+                        setProfile(res.data);
+                      } catch (e) {
+                        alert('Ошибка при отправке запроса в друзья');
+                      }
+                    }}
+                    className="ml-4 mt-2 md:mt-0 px-4 py-2 rounded font-bold bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                  >
+                    Запросить дружбу
+                  </button>
+                )}
+              </>
             )}
           </div>
           <div className="flex justify-center md:justify-start gap-8 mb-4">

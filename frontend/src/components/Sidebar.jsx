@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
@@ -9,6 +9,7 @@ const MessagesIcon = () => <span>💬</span>;
 const NotificationsIcon = () => <span>❤️</span>;
 const CreateIcon = () => <span>➕</span>;
 const ProfileIcon = () => <span>👤</span>;
+const FriendsIcon = () => <span>👥</span>;
 
 export default function Sidebar() {
   const { user, logout } = useContext(AuthContext);
@@ -59,6 +60,12 @@ export default function Sidebar() {
             <NavLink to={`/profile/${user.username}`} className={navLinkClasses}>
               <ProfileIcon />
               Профиль
+            </NavLink>
+          )}
+          {user && (
+            <NavLink to="/friends" className={navLinkClasses}>
+              <FriendsIcon />
+              Друзья
             </NavLink>
           )}
         </nav>
