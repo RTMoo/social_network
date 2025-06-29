@@ -7,6 +7,7 @@ from posts.selectors import get_post
 from posts.utils import normalize_post_image, make_post_preview
 from posts.utils import decrement_posts_count, increment_posts_count
 from django.db import transaction
+from notifications.tasks import notify_subscribers_about_new_post
 
 
 def create_post(data: dict[str, Any], sender: CustomUser) -> Post:
@@ -38,6 +39,8 @@ def create_post(data: dict[str, Any], sender: CustomUser) -> Post:
         post.preview.save(preview_name, preview_image, save=True)
 
         increment_posts_count(user=sender)
+
+    notify_subscribers_about_new_post.delay(sender.username)
 
     return post
 
