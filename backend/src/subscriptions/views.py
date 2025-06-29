@@ -4,7 +4,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from subscriptions.services import subscribe, unsubscribe, delete_subscriber
-from subscriptions.selectors import get_user_subscriptions, get_user_subscribers
+from subscriptions.selectors import (
+    get_user_subscription_profiles,
+    get_user_subscriber_profiles,
+)
 from profiles.serializers import ProfileSerializer
 
 
@@ -39,7 +42,7 @@ class SubscriptionsListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, username: str):
-        subscriptions = get_user_subscriptions(username=username)
+        subscriptions = get_user_subscription_profiles(username=username)
         data = ProfileSerializer(instance=subscriptions, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)
@@ -49,7 +52,7 @@ class SubscribersListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, username: str):
-        subscribers = get_user_subscribers(username=username)
+        subscribers = get_user_subscriber_profiles(username=username)
         data = ProfileSerializer(instance=subscribers, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)

@@ -9,7 +9,9 @@ from profiles.models import Profile
 
 
 def normalize_post_image(
-    input_path: str, size: Tuple[int, int] = (1080, 720), quality: int = 85
+    input_path: str,
+    size: Tuple[int, int] = (1080, 720),
+    quality: int = 85,
 ) -> ContentFile:
     """
     Сжимает и нормализует оригинальное изображение поста.
@@ -23,7 +25,7 @@ def normalize_post_image(
         ContentFile: Сжатое изображение в формате JPEG.
     """
     img = Image.open(input_path).convert("RGB")
-    img.thumbnail(size, Image.LANCZOS)
+    img.thumbnail(size, Image.Resampling.LANCZOS)
 
     byte_io = BytesIO()
     img.save(byte_io, format="JPEG", quality=quality)
@@ -31,21 +33,23 @@ def normalize_post_image(
 
 
 def make_post_preview(
-    input_path: str, size: Tuple[int, int] = (400, 400), quality: int = 95
+    input_file: ContentFile,
+    size: Tuple[int, int] = (400, 400),
+    quality: int = 95,
 ) -> ContentFile:
     """
     Создаёт уменьшенную версию (preview) для поста.
 
     Args:
-        input_path (str): Путь к исходному изображению.
-        size (Tuple[int, int], optional): Размер превью. По умолчанию (400, 400).
-        quality (int, optional): Качество JPEG. По умолчанию 95.
+        input_file (Union[str, IO, ContentFile]): Исходное изображение или путь к нему.
+        size (Tuple[int, int], optional): Размер превью.
+        quality (int, optional): Качество JPEG.
 
     Returns:
         ContentFile: Превью изображения в формате JPEG.
     """
-    img = Image.open(input_path).convert("RGB")
-    img.thumbnail(size, Image.LANCZOS)
+    img = Image.open(input_file).convert("RGB")
+    img.thumbnail(size, Image.Resampling.LANCZOS)
 
     byte_io = BytesIO()
     img.save(byte_io, format="JPEG", quality=quality)

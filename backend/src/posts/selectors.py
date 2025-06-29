@@ -2,7 +2,7 @@ from typing import List, Set
 
 from rest_framework.exceptions import NotFound
 from posts.models import Post
-from subscriptions.selectors import get_user_subscriptions
+from subscriptions.selectors import get_user_subscription_profiles
 from likes.models import Like
 from accounts.models import CustomUser
 from django.db.models import QuerySet
@@ -85,7 +85,7 @@ def get_subscription_posts(username: str) -> QuerySet:
     Returns:
         QuerySet: Посты подписок.
     """
-    subscriptions = get_user_subscriptions(username=username)
+    subscriptions = get_user_subscription_profiles(username=username)
 
     posts = (
         Post.objects.filter(author__username__in=subscriptions)
