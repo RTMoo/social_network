@@ -10,6 +10,7 @@ import EditProfilePage from './pages/EditProfilePage';
 import CreatePost from './pages/CreatePost';
 import MainLayout from './components/MainLayout';
 import Friends from './pages/Friends';
+import Notifications from './pages/Notifications';
 
 function App() {
   const { user, loading } = useContext(AuthContext);
@@ -39,6 +40,7 @@ function App() {
             <Route path="/profile/:username/edit" element={<EditProfilePage />} />
             <Route path="/create" element={<CreatePost />} />
             <Route path="/friends" element={<Friends />} />
+            <Route path="/notifications" element={<Notifications />} />
             {/* Другие маршруты внутри MainLayout */}
           </Routes>
         </MainLayout>

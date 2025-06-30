@@ -5,3 +5,4 @@ export * as commentsApi from './endpoints/comments';
 export * as likesApi from './endpoints/likes';
 export * as subscriptionsApi from './endpoints/subscriptions';
 export * as friendshipsApi from './endpoints/friendships';
+export * from './endpoints/notifications';

@@ -1,12 +1,13 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { getNotifications } from '../api';
 
 // Иконки (простые SVG для примера)
 const HomeIcon = () => <span>🏠</span>;
 const SearchIcon = () => <span>🔍</span>;
 const MessagesIcon = () => <span>💬</span>;
-const NotificationsIcon = () => <span>❤️</span>;
+const NotificationsIcon = () => <span>🔔</span>;
 const CreateIcon = () => <span>➕</span>;
 const ProfileIcon = () => <span>👤</span>;
 const FriendsIcon = () => <span>👥</span>;
@@ -14,6 +15,7 @@ const FriendsIcon = () => <span>👥</span>;
 export default function Sidebar() {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const navLinkClasses = ({ isActive }) =>
     `flex items-center gap-4 p-3 rounded-lg transition-colors duration-200 ${
@@ -29,6 +31,25 @@ export default function Sidebar() {
     await logout();
     navigate('/login');
   };
+
+  // Загружаем количество непрочитанных уведомлений
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      if (user) {
+        try {
+          const response = await getNotifications(false);
+          setUnreadCount(response.data.length);
+        } catch (error) {
+          console.error('Ошибка загрузки количества уведомлений:', error);
+        }
+      }
+    };
+
+    loadUnreadCount();
+    // Обновляем каждые 30 секунд
+    const interval = setInterval(loadUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <>
@@ -49,8 +70,15 @@ export default function Sidebar() {
             Сообщения
           </NavLink>
           <NavLink to="/notifications" className={navLinkClasses}>
-            <NotificationsIcon />
-            Уведомления
+            <div className="flex items-center gap-4 relative">
+              <NotificationsIcon />
+              <span>Уведомления</span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </div>
           </NavLink>
           <NavLink to="/create" className={navLinkClasses}>
             <CreateIcon />
@@ -93,7 +121,14 @@ export default function Sidebar() {
             <MessagesIcon />
           </NavLink>
           <NavLink to="/notifications" className={navLinkClasses}>
-            <NotificationsIcon />
+            <div className="relative">
+              <NotificationsIcon />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
           </NavLink>
           <NavLink to="/create" className={navLinkClasses}>
             <CreateIcon />
@@ -131,7 +166,14 @@ export default function Sidebar() {
             <span className="text-xs">Создать</span>
           </NavLink>
           <NavLink to="/notifications" className={mobileNavLinkClasses}>
-            <NotificationsIcon />
+            <div className="relative">
+              <NotificationsIcon />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
             <span className="text-xs">Уведомления</span>
           </NavLink>
           {user && (
