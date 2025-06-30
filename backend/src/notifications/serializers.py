@@ -8,4 +8,4 @@ class NotificationSerializer(serializers.Serializer):
     to_user = serializers.CharField(read_only=True, source="to_user.username")
     type = serializers.ChoiceField(choices=Notification.Types.choices)
     created_at = serializers.DateTimeField(read_only=True)
-    is_read = serializers.BooleanField()
+    is_read = serializers.BooleanField(read_only=True)

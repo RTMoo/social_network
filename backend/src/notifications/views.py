@@ -19,6 +19,7 @@ def get_notifications(request):
     Query параметры:
     - is_read: true/false для фильтрации по статусу прочтения
     """
+
     is_read_param = request.query_params.get("is_read")
 
     # Преобразуем строку в boolean
@@ -41,14 +42,12 @@ def mark_as_read(request, notification_id):
     """
     Отмечает уведомление как прочитанное.
     """
-    try:
-        notification = mark_notification_as_read(
-            notification_id=notification_id, username=request.user.username
-        )
-        serializer = NotificationSerializer(notification)
-        return Response(serializer.data)
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+    notification = mark_notification_as_read(
+        notification_id=notification_id, username=request.user.username
+    )
+    serializer = NotificationSerializer(notification)
+    return Response(serializer.data)
 
 
 @api_view(["DELETE"])
@@ -57,10 +56,6 @@ def delete_notification_view(request, notification_id):
     """
     Удаляет уведомление.
     """
-    try:
-        delete_notification(
-            notification_id=notification_id, username=request.user.username
-        )
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+    delete_notification(notification_id=notification_id, username=request.user.username)
+    return Response(status=status.HTTP_204_NO_CONTENT)

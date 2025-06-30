@@ -1,7 +1,6 @@
 from typing import List
 from notifications.models import Notification
 from notifications.selectors import get_user_notification, get_user_notification_list
-from rest_framework.exceptions import NotFound
 
 
 def get_user_notifications_service(
@@ -36,13 +35,10 @@ def mark_notification_as_read(notification_id: int, username: str) -> Notificati
     Raises:
         NotFound: Если уведомление не найдено или не принадлежит пользователю
     """
-    notification = Notification.objects.filter(
-        id=notification_id,
-        to_user__username=username,
-    ).first()
-
-    if not notification:
-        raise NotFound("Уведомление не найдено")
+    notification = get_user_notification(
+        notification_id=notification_id,
+        username=username,
+    )
 
     notification.is_read = True
     notification.save()
