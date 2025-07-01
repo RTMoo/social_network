@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { getNotifications, markAsRead, deleteNotification } from '../api';
+import { getNotifications, markAsRead, deleteNotification, postsApi, commentsApi } from '../api';
 import { AuthContext } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
+import PostModal from '../components/PostModal';
 
 const Notifications = () => {
   const [activeTab, setActiveTab] = useState('unread');
@@ -8,6 +10,9 @@ const Notifications = () => {
   const [readNotifications, setReadNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
   useEffect(() => {
     loadNotifications();
@@ -48,14 +53,31 @@ const Notifications = () => {
     }
   };
 
-  const getNotificationText = (notification) => {
+  const getNotificationText = (notification, onPostTitleClick) => {
+    const fromUserLink = (
+      <Link to={`/profile/${notification.from_user}`} className="text-blue-600 hover:underline font-semibold" onClick={e => e.stopPropagation()}>
+        {notification.from_user || 'Пользователь'}
+      </Link>
+    );
+    const postTitle = notification.post_id ? (
+      <span
+        className="text-blue-600 hover:underline font-semibold cursor-pointer"
+        onClick={e => {
+          e.stopPropagation();
+          onPostTitleClick(notification);
+        }}
+      >
+        {notification.post_title || 'пост'}
+      </span>
+    ) : (notification.post_title || 'пост');
+
     switch (notification.type) {
       case 'new_post':
-        return `${notification.from_user || 'Пользователь'} опубликовал новый пост`;
+        return <>{fromUserLink} опубликовал пост: {postTitle}</>;
       case 'like':
-        return `${notification.from_user || 'Пользователь'} поставил лайк вашему посту`;
+        return <>{fromUserLink} поставил лайк вашему посту: {postTitle}</>;
       case 'comment':
-        return `${notification.from_user || 'Пользователь'} прокомментировал ваш пост`;
+        return <>{fromUserLink} написал комментарий: "{notification.comment_text || ''}"</>;
       default:
         return 'Новое уведомление';
     }
@@ -74,6 +96,23 @@ const Notifications = () => {
       const diffInDays = Math.floor(diffInHours / 24);
       return `${diffInDays} дн. назад`;
     }
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (notification.post_id) {
+      try {
+        const res = await postsApi.getPost(notification.post_id);
+        setSelectedPost(res.data);
+        setIsModalOpen(true);
+      } catch (e) {
+        // Можно добавить обработку ошибки
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
   };
 
   return (
@@ -140,7 +179,7 @@ const Notifications = () => {
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">
-                              {getNotificationText(notification)}
+                              {getNotificationText(notification, handleNotificationClick)}
                             </p>
                             <p className="text-sm text-gray-500">
                               {formatDate(notification.created_at)}
@@ -149,7 +188,10 @@ const Notifications = () => {
                         </div>
                       </div>
                       <button
-                        onClick={() => handleMarkAsRead(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMarkAsRead(notification.id);
+                        }}
                         className="ml-4 px-4 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                       >
                         Прочитано
@@ -188,8 +230,8 @@ const Notifications = () => {
                             </span>
                           </div>
                           <div>
-                            <p className="font-medium text-gray-700">
-                              {getNotificationText(notification)}
+                            <p className="font-medium text-gray-900">
+                              {getNotificationText(notification, handleNotificationClick)}
                             </p>
                             <p className="text-sm text-gray-400">
                               {formatDate(notification.created_at)}
@@ -198,7 +240,10 @@ const Notifications = () => {
                         </div>
                       </div>
                       <button
-                        onClick={() => handleDelete(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(notification.id);
+                        }}
                         className="ml-4 px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                       >
                         Удалить
@@ -211,6 +256,13 @@ const Notifications = () => {
           )}
         </div>
       )}
+
+      <PostModal
+        post={selectedPost}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        backendUrl={backendUrl}
+      />
     </div>
   );
 };

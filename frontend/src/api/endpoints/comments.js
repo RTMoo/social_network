@@ -6,3 +6,4 @@ export const getCommentReplies = (commentId) => api.get(`/comments/${commentId}/
 export const getUserComments = (username) => api.get(`/comments/user/${username}/`);
 export const updateComment = (commentId, data) => api.patch(`/comments/${commentId}/update/`, data);
 export const deleteComment = (commentId) => api.delete(`/comments/${commentId}/delete/`);
+export const getComment = (commentId) => api.get(`/comments/${commentId}/`);

@@ -75,14 +75,6 @@ export default function Profile() {
     }
   };
 
-  const handleProfileUpdate = async () => {
-    try {
-      const res = await profilesApi.getProfile(username);
-      setProfile(res.data);
-      setSubscribed(!!res.data.is_subscribed);
-    } catch {}
-  };
-
   const handlePostClick = (post) => {
     setSelectedPost(post);
     setIsModalOpen(true);
