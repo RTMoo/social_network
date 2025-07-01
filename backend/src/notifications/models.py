@@ -6,6 +6,7 @@ class Notification(models.Model):
         NEW_POST = "new_post", "Новый пост"
         LIKE = "like", "Лайк"
         COMMENT = "comment", "Комментарий"
+        SUBSCRIBE = "subscribe", "Подписка"
 
     to_user = models.ForeignKey(
         to="accounts.CustomUser",
@@ -24,6 +25,18 @@ class Notification(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+    post = models.ForeignKey(
+        to="posts.Post",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    comment = models.ForeignKey(
+        to="comments.Comment",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ["-created_at"]

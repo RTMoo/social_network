@@ -1,6 +1,7 @@
 from likes.models import Like
 from posts.models import Post
 from comments.models import Comment
+from accounts.models import CustomUser
 from typing import List
 
 
@@ -36,3 +37,11 @@ def get_user_liked_comments(username: str) -> List[Comment]:
     ).select_related("comment__author")
 
     return [like.comment for like in likes]
+
+
+def user_liked_post_exists(user: CustomUser, post: Post) -> bool:
+    """
+    Возвращает True, если пользователь лайкнул пост.
+    """
+
+    return Like.objects.filter(user=user, post=post).exists()

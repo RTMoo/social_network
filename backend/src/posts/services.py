@@ -40,7 +40,7 @@ def create_post(data: dict[str, Any], sender: CustomUser) -> Post:
 
         increment_posts_count(user=sender)
 
-    notify_subscribers_about_new_post.delay(sender.username)
+    notify_subscribers_about_new_post.delay(sender.username, post.id)
 
     return post
 

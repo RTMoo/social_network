@@ -4,6 +4,7 @@ from rest_framework.exceptions import NotFound
 from posts.models import Post
 from subscriptions.selectors import get_user_subscription_profiles
 from likes.models import Like
+from likes.selectors import user_liked_post_exists
 from accounts.models import CustomUser
 from django.db.models import QuerySet
 
@@ -54,7 +55,7 @@ def get_user_posts(username: str, sender: CustomUser) -> QuerySet:
     return posts
 
 
-def get_post(post_id: int) -> Post:
+def get_post(post_id: int, sender: CustomUser = None) -> Post:
     """
     Возвращает пост по id.
 
@@ -71,6 +72,9 @@ def get_post(post_id: int) -> Post:
 
     if not post:
         raise NotFound()
+    
+    if sender:
+        post.is_liked_by_user = user_liked_post_exists(user=sender, post=post)
 
     return post
 

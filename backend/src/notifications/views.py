@@ -4,10 +4,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from notifications.serializers import NotificationSerializer
 from notifications.services import (
-    get_user_notifications_service,
     mark_notification_as_read,
     delete_notification,
 )
+from notifications.selectors import get_user_notification_list
 
 
 @api_view(["GET"])
@@ -22,18 +22,15 @@ def get_notifications(request):
 
     is_read_param = request.query_params.get("is_read")
 
-    # Преобразуем строку в boolean
-    is_read = None
-    if is_read_param is not None:
-        is_read = is_read_param.lower() == "true"
+    is_read = is_read_param.lower() == "true" if is_read_param else False
 
-    notifications = get_user_notifications_service(
+    notifications = get_user_notification_list(
         username=request.user.username,
         is_read=is_read,
     )
 
-    serializer = NotificationSerializer(notifications, many=True)
-    return Response(serializer.data)
+    data = NotificationSerializer(notifications, many=True).data
+    return Response(data=data, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -46,8 +43,8 @@ def mark_as_read(request, notification_id):
     notification = mark_notification_as_read(
         notification_id=notification_id, username=request.user.username
     )
-    serializer = NotificationSerializer(notification)
-    return Response(serializer.data)
+    data = NotificationSerializer(notification).data
+    return Response(data=data, status=status.HTTP_200_OK)
 
 
 @api_view(["DELETE"])
