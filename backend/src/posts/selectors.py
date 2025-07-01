@@ -72,7 +72,7 @@ def get_post(post_id: int, sender: CustomUser = None) -> Post:
 
     if not post:
         raise NotFound()
-    
+
     if sender:
         post.is_liked_by_user = user_liked_post_exists(user=sender, post=post)
 

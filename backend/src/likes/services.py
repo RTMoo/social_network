@@ -1,10 +1,11 @@
-from typing import Any, Dict
+from typing import Dict
 
 from likes.models import Like
 from likes.utils import change_likes_count
 from accounts.models import CustomUser
 from posts.selectors import get_post
 from comments.selectors import get_comment
+from notifications.tasks import notify_user_about_new_like
 
 
 def like_post(post_id: int, sender: CustomUser) -> Dict[str, bool]:
@@ -24,6 +25,7 @@ def like_post(post_id: int, sender: CustomUser) -> Dict[str, bool]:
     if liked_post:
         liked_post.delete()
         change_likes_count(obj=post, increment=False)
+        notify_user_about_new_like.delay(sender.username, post_id)
 
         return {"liked": False}
     else:

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 
 class Notification(models.Model):
@@ -39,4 +40,16 @@ class Notification(models.Model):
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["from_user", "to_user", "type", "post"],
+                condition=Q(type="like"),
+                name="unique_like_notification",
+            ),
+            models.UniqueConstraint(
+                fields=["from_user", "to_user", "type"],
+                condition=Q(type="subscribe"),
+                name="unique_subscribe_notification",
+            ),
+        ]
         ordering = ["-created_at"]
