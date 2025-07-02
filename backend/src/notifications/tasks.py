@@ -4,6 +4,7 @@ from subscriptions.selectors import get_user_subscribers
 from notifications.models import Notification
 from accounts.selectors import get_user
 from posts.selectors import get_post
+from subscriptions.selectors import get_subscription
 
 
 @shared_task
@@ -55,6 +56,28 @@ def notify_user_about_new_like(liked_user_username: str, post_id: int) -> None:
             to_user=post.author,
             type=Notification.Types.LIKE,
             post=post,
+        )
+    except IntegrityError:
+        return None
+
+
+@shared_task
+def notify_user_about_new_subscribe(subscription_id: int) -> None:
+    """
+    Уведомляет пользователя о новой подписке.
+
+    Args:
+        subscriber_username (str): username подписчика.
+        subscribed_user_username (str): username пользователя, на которого подписан.
+    """
+
+    subscription = get_subscription(subscription_id=subscription_id)
+
+    try:
+        Notification.objects.create(
+            from_user=subscription.subscriber,
+            to_user=subscription.to_subscribe,
+            type=Notification.Types.SUBSCRIBE,
         )
     except IntegrityError:
         return None

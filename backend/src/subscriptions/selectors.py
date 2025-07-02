@@ -5,9 +5,9 @@ from accounts.models import CustomUser
 from typing import List
 
 
-def get_subscribe(subscriber: str, to_subscribe: str) -> Subscription:
+def get_subscription_between(subscriber: str, to_subscribe: str) -> Subscription:
     """
-    Возвращает объект подписки.
+    Возвращает объект подписки между двумя пользователями.
 
     Args:
         subscriber (str): Имя пользователя, который подписан.
@@ -30,7 +30,29 @@ def get_subscribe(subscriber: str, to_subscribe: str) -> Subscription:
     )
 
     if not subscription:
-        raise NotFound(detail="Подписка не найдена.")
+        raise NotFound(detail="Подписка между пользователями не найдена.")
+
+    return subscription
+
+
+def get_subscription(subscription_id: int) -> Subscription:
+    """
+    Возвращает объект подписки по его id.
+    
+    Args:
+        subscription_id (int): id подписки.
+
+    Returns:
+        Subscription: Объект подписки.
+
+    Raises:
+        NotFound: Если подписка не найдена.
+    """
+
+    subscription = Subscription.objects.filter(id=subscription_id).first()
+    
+    if not subscription:
+        raise NotFound(detail="Подписка не найдена.")
 
     return subscription
 

@@ -3,9 +3,10 @@ from django.db import IntegrityError, transaction
 from accounts.models import CustomUser
 from accounts.selectors import get_user
 from subscriptions.models import Subscription
-from subscriptions.selectors import get_subscribe
+from subscriptions.selectors import get_subscription_between
 from rest_framework.exceptions import ValidationError
 from subscriptions.utils import increment_subscribe_count, decrement_subscribe_count
+from notifications.tasks import notify_user_about_new_subscribe
 
 
 def subscribe(sender: CustomUser, username: str) -> None:
@@ -28,15 +29,17 @@ def subscribe(sender: CustomUser, username: str) -> None:
 
     try:
         with transaction.atomic():
-            Subscription.objects.create(subscriber=sender, to_subscribe=to_subscribe)
+            subscription = Subscription.objects.create(subscriber=sender, to_subscribe=to_subscribe)
             increment_subscribe_count(
                 subscriber=sender,
                 to_subscribe=to_subscribe,
             )
+            notify_user_about_new_subscribe.delay(subscription.pk)
 
     except IntegrityError:
         raise ValidationError("Подписка уже существует.")
 
+    
 
 def unsubscribe(sender: CustomUser, username: str) -> None:
     """
@@ -53,7 +56,7 @@ def unsubscribe(sender: CustomUser, username: str) -> None:
     if sender.username == username:
         raise ValidationError("Нельзя отписаться от самого себя.")
 
-    subscription = get_subscribe(subscriber=sender.username, to_subscribe=username)
+    subscription = get_subscription_between(subscriber=sender.username, to_subscribe=username)
 
     with transaction.atomic():
         decrement_subscribe_count(
@@ -68,7 +71,7 @@ def delete_subscriber(sender: CustomUser, username: str) -> None:
     Удаляет пользователя из списка подписчиков.
     """
     subscriber = get_user(username=username)
-    subscription = get_subscribe(subscriber=username, to_subscribe=sender.username)
+    subscription = get_subscription_between(subscriber=username, to_subscribe=sender.username)
 
     with transaction.atomic():
         subscription.delete()

@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { getNotifications, markAsRead, deleteNotification, postsApi, commentsApi } from '../api';
-import { AuthContext } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { getNotifications, markAsRead, deleteNotification, postsApi } from '../api';
 import { Link } from 'react-router-dom';
 import PostModal from '../components/PostModal';
 
@@ -9,7 +8,6 @@ const Notifications = () => {
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [readNotifications, setReadNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
@@ -77,7 +75,9 @@ const Notifications = () => {
       case 'like':
         return <>{fromUserLink} поставил лайк вашему посту: {postTitle}</>;
       case 'comment':
-        return <>{fromUserLink} написал комментарий: "{notification.comment_text || ''}"</>;
+        return <>{fromUserLink} написал комментарий к посту: {postTitle}: "{notification.comment_text || ''}"</>;
+      case 'subscribe':
+        return <>{fromUserLink} подписался на вас</>;
       default:
         return 'Новое уведомление';
     }
@@ -105,7 +105,7 @@ const Notifications = () => {
         setSelectedPost(res.data);
         setIsModalOpen(true);
       } catch (e) {
-        // Можно добавить обработку ошибки
+        console.error('Ошибка загрузки поста:', e);
       }
     }
   };
