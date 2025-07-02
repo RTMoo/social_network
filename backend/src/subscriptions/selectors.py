@@ -38,7 +38,7 @@ def get_subscription_between(subscriber: str, to_subscribe: str) -> Subscription
 def get_subscription(subscription_id: int) -> Subscription:
     """
     Возвращает объект подписки по его id.
-    
+
     Args:
         subscription_id (int): id подписки.
 
@@ -50,7 +50,7 @@ def get_subscription(subscription_id: int) -> Subscription:
     """
 
     subscription = Subscription.objects.filter(id=subscription_id).first()
-    
+
     if not subscription:
         raise NotFound(detail="Подписка не найдена.")
 

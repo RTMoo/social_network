@@ -31,24 +31,32 @@ def get_user_liked_current_comment_ids(
     return liked_ids
 
 
-def get_comment(comment_id: int) -> Comment:
+def get_comment(comment_id: int, to_notify: bool = False) -> Comment:
     """
     Возвращает комментарий по id.
 
     Args:
-        comment_id (int): id комментария, который нужно получить.
+        comment_id (int): id комментария.
+        to_notify (bool): Флаг, нужен ли comment для уведомлений (расширенные связи).
 
     Returns:
         Comment: Комментарий.
 
     Raises:
-        NotFound: Если комментарий не найден.
+        NotFound: Если не найден.
     """
+
+    select_fields = {
+        False: ("author", "thread", "reply_to_author"),
+        True: ("author", "post__author"),
+    }
+
     comment = (
         Comment.objects.filter(id=comment_id)
-        .select_related("author", "thread", "reply_to_author")
+        .select_related(*select_fields[to_notify])
         .first()
     )
+
     if not comment:
         raise NotFound()
     return comment

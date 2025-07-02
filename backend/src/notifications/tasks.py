@@ -5,6 +5,7 @@ from notifications.models import Notification
 from accounts.selectors import get_user
 from posts.selectors import get_post
 from subscriptions.selectors import get_subscription
+from comments.selectors import get_comment
 
 
 @shared_task
@@ -78,6 +79,32 @@ def notify_user_about_new_subscribe(subscription_id: int) -> None:
             from_user=subscription.subscriber,
             to_user=subscription.to_subscribe,
             type=Notification.Types.SUBSCRIBE,
+        )
+    except IntegrityError:
+        return None
+
+
+@shared_task
+def notify_user_about_new_comment(comment_id: int) -> None:
+    """
+    Уведомляет пользователя о новом комментарии.
+
+    Args:
+        comment_id (int): id комментария.
+    """
+
+    comment = get_comment(comment_id=comment_id, to_notify=True)
+
+    if comment.author == comment.post.author:
+        return None
+
+    try:
+        Notification.objects.create(
+            from_user=comment.author,
+            to_user=comment.post.author,
+            type=Notification.Types.COMMENT,
+            post=comment.post,
+            comment=comment,
         )
     except IntegrityError:
         return None

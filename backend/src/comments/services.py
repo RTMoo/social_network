@@ -4,6 +4,7 @@ from comments.models import Comment
 from posts.selectors import get_post
 from comments.selectors import get_comment
 from rest_framework.exceptions import ValidationError, PermissionDenied
+from notifications.tasks import notify_user_about_new_comment
 
 
 def create_comment(
@@ -53,6 +54,8 @@ def create_comment(
         reply_to_author=reply_to_author,
         text=data.get("text"),
     )
+    
+    notify_user_about_new_comment.delay(comment.id)
 
     return comment
 
