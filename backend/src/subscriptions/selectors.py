@@ -20,10 +20,14 @@ def get_subscribe(subscriber: str, to_subscribe: str) -> Subscription:
         NotFound: Если подписка не найдена.
     """
 
-    subscription = Subscription.objects.filter(
-        subscriber__username=subscriber,
-        to_subscribe__username=to_subscribe,
-    ).first()
+    subscription = (
+        Subscription.objects.filter(
+            subscriber__username=subscriber,
+            to_subscribe__username=to_subscribe,
+        )
+        .select_related("to_subscribe", "subscriber")
+        .first()
+    )
 
     if not subscription:
         raise NotFound(detail="Подписка не найдена.")

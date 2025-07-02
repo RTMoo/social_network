@@ -29,7 +29,11 @@ def subscribe(sender: CustomUser, username: str) -> None:
     try:
         with transaction.atomic():
             Subscription.objects.create(subscriber=sender, to_subscribe=to_subscribe)
-            increment_subscribe_count(sender=sender, to_subscribe=to_subscribe)
+            increment_subscribe_count(
+                subscriber=sender,
+                to_subscribe=to_subscribe,
+            )
+
     except IntegrityError:
         raise ValidationError("Подписка уже существует.")
 
@@ -51,11 +55,12 @@ def unsubscribe(sender: CustomUser, username: str) -> None:
 
     subscription = get_subscribe(subscriber=sender.username, to_subscribe=username)
 
-    to_subscribe = subscription.to_subscribe
-
     with transaction.atomic():
+        decrement_subscribe_count(
+            subscriber=sender,
+            to_subscribe=subscription.to_subscribe,
+        )
         subscription.delete()
-        decrement_subscribe_count(sender=sender, to_subscribe=to_subscribe)
 
 
 def delete_subscriber(sender: CustomUser, username: str) -> None:
@@ -67,4 +72,7 @@ def delete_subscriber(sender: CustomUser, username: str) -> None:
 
     with transaction.atomic():
         subscription.delete()
-        decrement_subscribe_count(sender=subscriber, to_subscribe=sender)
+        decrement_subscribe_count(
+            subscriber=subscriber,
+            to_subscribe=sender,
+        )

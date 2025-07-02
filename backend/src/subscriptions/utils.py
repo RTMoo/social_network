@@ -4,13 +4,13 @@ from django.db.models import F
 from profiles.models import Profile
 
 
-def increment_subscribe_count(sender: CustomUser, to_subscribe: CustomUser) -> None:
+def increment_subscribe_count(subscriber: CustomUser, to_subscribe: CustomUser) -> None:
     """
     Увеличивает количество подписок у отправителя и количество подписчиков у получателя.
     """
 
     with transaction.atomic():
-        Profile.objects.filter(user=sender).update(
+        Profile.objects.filter(user=subscriber).update(
             subscription_count=F("subscription_count") + 1
         )
         Profile.objects.filter(user=to_subscribe).update(
@@ -18,13 +18,13 @@ def increment_subscribe_count(sender: CustomUser, to_subscribe: CustomUser) -> N
         )
 
 
-def decrement_subscribe_count(sender: CustomUser, to_subscribe: CustomUser) -> None:
+def decrement_subscribe_count(subscriber: CustomUser, to_subscribe: CustomUser) -> None:
     """
     Уменьшает количество подписок у отправителя и количество подписчиков у получателя.
     """
 
     with transaction.atomic():
-        Profile.objects.filter(user=sender).update(
+        Profile.objects.filter(user=subscriber).update(
             subscription_count=F("subscription_count") - 1
         )
         Profile.objects.filter(user=to_subscribe).update(
