@@ -54,7 +54,7 @@ def create_comment(
         reply_to_author=reply_to_author,
         text=data.get("text"),
     )
-    
+
     notify_user_about_new_comment.delay(comment.id)
 
     return comment
@@ -80,6 +80,7 @@ def update_comment(
     Raises:
         PermissionDenied: Если комментарий не принадлежит отправителю.
     """
+
     comment = get_comment(comment_id=comment_id)
 
     if comment.author != sender:
@@ -102,6 +103,7 @@ def delete_comment(comment_id: int, sender: CustomUser) -> None:
     Raises:
         PermissionDenied: Если комментарий не принадлежит отправителю.
     """
+
     comment = get_comment(comment_id=comment_id)
 
     if comment.author != sender:
