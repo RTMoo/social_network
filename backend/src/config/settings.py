@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django_countries",
     "silk",
     "corsheaders",
+    "django_elasticsearch_dsl",
 ]
 
 MIDDLEWARE = [
@@ -173,3 +174,10 @@ EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
+
+# Elasticsearch
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': os.getenv('ELASTICSEARCH_HOST', 'http://localhost:9200'),
+    },
+}
