@@ -1,3 +1,5 @@
+from typing import List
+from django.db.models import QuerySet
 from rest_framework.exceptions import NotFound
 from profiles.models import Profile
 from accounts.models import CustomUser
@@ -69,3 +71,12 @@ def get_my_profile(user: CustomUser) -> Profile:
         raise NotFound(detail="Профиль не найден.")
 
     return profile
+
+
+def get_profiles_with_id(ids: List[int]) -> QuerySet[Profile]:
+    """
+    Возвращает список профилей
+    """
+    profiles = Profile.objects.filter(id__in=ids).select_related("user")
+
+    return profiles

@@ -2,12 +2,10 @@ from django_elasticsearch_dsl import Document, Index, fields
 from django_elasticsearch_dsl.registries import registry
 from profiles.models import Profile
 
-profile_index = Index('profiles')
+profile_index = Index("profiles")
 
-profile_index.settings(
-    number_of_shards=1,
-    number_of_replicas=0
-)
+profile_index.settings(number_of_shards=1, number_of_replicas=0)
+
 
 @registry.register_document
 class ProfileDocument(Document):
@@ -17,7 +15,7 @@ class ProfileDocument(Document):
     username = fields.TextField(attr="user.username")
 
     class Index:
-        name = 'profiles'
+        name = "profiles"
 
     class Django:
         model = Profile

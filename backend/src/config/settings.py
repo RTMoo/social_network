@@ -178,7 +178,7 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 
 # Elasticsearch
 ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': os.getenv('ELASTICSEARCH_HOST', 'http://localhost:9200'),
+    "default": {
+        "hosts": os.getenv("ELASTICSEARCH_HOST", "http://elasticsearch:9200"),
     },
 }
