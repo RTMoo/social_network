@@ -154,6 +154,9 @@ python manage.py migrate
 
 # Создание суперпользователя (опционально)
 python manage.py createsuperuser
+
+# Создание тестовых пользователей (опционально)
+python manage.py create_test_users
 ```
 
 ### 5. Создание индексов Elasticsearch
