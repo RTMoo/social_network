@@ -8,6 +8,7 @@ import ConfirmCode from './pages/ConfirmCode';
 import Profile from './pages/Profile';
 import EditProfilePage from './pages/EditProfilePage';
 import CreatePost from './pages/CreatePost';
+import Search from './pages/Search';
 import MainLayout from './components/MainLayout';
 import Friends from './pages/Friends';
 import Notifications from './pages/Notifications';
@@ -34,8 +35,9 @@ function App() {
     <>
       {showLayout ? (
         <MainLayout>
-    <Routes>
-      <Route path="/" element={<Home />} />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/search" element={<Search />} />
             <Route path="/profile/:username" element={<Profile />} />
             <Route path="/profile/:username/edit" element={<EditProfilePage />} />
             <Route path="/create" element={<CreatePost />} />
