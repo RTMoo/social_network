@@ -59,6 +59,15 @@ services:
       memlock:
         soft: -1
         hard: -1
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 volumes:
   redis_data:
   es_data:
