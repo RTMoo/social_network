@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "subscriptions",
     "friendships",
     "notifications",
+    "search",
     "django_countries",
     "silk",
     "corsheaders",
