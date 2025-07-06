@@ -43,10 +43,12 @@ INSTALLED_APPS = [
     "friendships",
     "notifications",
     "search",
+    "chats",
     "django_countries",
     "silk",
     "corsheaders",
     "django_elasticsearch_dsl",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -180,5 +182,14 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 ELASTICSEARCH_DSL = {
     "default": {
         "hosts": os.getenv("ELASTICSEARCH_HOST", "http://elasticsearch:9200"),
+    },
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
     },
 }
