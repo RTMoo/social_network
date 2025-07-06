@@ -12,6 +12,7 @@ import Search from './pages/Search';
 import MainLayout from './components/MainLayout';
 import Friends from './pages/Friends';
 import Notifications from './pages/Notifications';
+import Messages from './pages/Messages';
 
 function App() {
   const { user, loading } = useContext(AuthContext);
@@ -43,6 +44,7 @@ function App() {
             <Route path="/create" element={<CreatePost />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/notifications" element={<Notifications />} />
+            <Route path="/messages" element={<Messages />} />
             {/* Другие маршруты внутри MainLayout */}
           </Routes>
         </MainLayout>

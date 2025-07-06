@@ -7,3 +7,4 @@ export * as subscriptionsApi from './endpoints/subscriptions';
 export * as friendshipsApi from './endpoints/friendships';
 export * as searchApi from './endpoints/search';
 export * from './endpoints/notifications';
+export * from './endpoints/chats';
