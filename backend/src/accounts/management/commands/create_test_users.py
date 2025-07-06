@@ -3,7 +3,7 @@ from accounts.models import CustomUser
 
 
 class Command(BaseCommand):
-    help = 'Создает 10 тестовых пользователей с email_verified=True'
+    help = "Создает 10 тестовых пользователей с email_verified=True"
 
     def handle(self, *args, **options):
         created_count = 0
@@ -17,15 +17,14 @@ class Command(BaseCommand):
             if CustomUser.objects.filter(username=username).exists():
                 self.stdout.write(
                     self.style.WARNING(
-                        f'Пользователь {username} уже существует, пропускаем')
+                        f"Пользователь {username} уже существует, пропускаем"
+                    )
                 )
                 continue
 
             # Создаем пользователя
             user = CustomUser.objects.create_user(
-                username=username,
-                email=email,
-                password=password
+                username=username, email=email, password=password
             )
 
             # Устанавливаем email_verified=True
@@ -34,20 +33,14 @@ class Command(BaseCommand):
 
             created_count += 1
             self.stdout.write(
-                self.style.SUCCESS(
-                    f'Создан пользователь: {username} ({email})')
+                self.style.SUCCESS(f"Создан пользователь: {username} ({email})")
             )
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f'Готово! Создано {created_count} пользователей')
+            self.style.SUCCESS(f"Готово! Создано {created_count} пользователей")
         )
 
         if created_count > 0:
-            self.stdout.write(
-                self.style.SUCCESS('Данные для входа:')
-            )
+            self.stdout.write(self.style.SUCCESS("Данные для входа:"))
             for i in range(1, created_count + 1):
-                self.stdout.write(
-                    f'  user{i}a.com / admin'
-                )
+                self.stdout.write(f"  user{i}a.com / admin")
