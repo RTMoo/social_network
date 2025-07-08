@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getChats, createChat, getChatMessages } from '../api/endpoints/chats';
 import { searchProfiles } from '../api/endpoints/search';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -17,6 +18,8 @@ const Messages = () => {
   const [wsConnected, setWsConnected] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const { chat_id } = useParams();
+  const navigate = useNavigate();
 
   // Прокрутка к последнему сообщению
   const scrollToBottom = () => {
@@ -34,6 +37,10 @@ const Messages = () => {
         setLoading(true);
         const response = await getChats();
         setChats(response.data);
+        if (chat_id) {
+          const found = response.data.find(chat => String(chat.chat_id) === String(chat_id));
+          if (found) setSelectedChat(found);
+        }
       } catch (error) {
         console.error('Ошибка загрузки чатов:', error);
       } finally {
@@ -42,7 +49,7 @@ const Messages = () => {
     };
 
     loadChats();
-  }, []);
+  }, [chat_id]);
 
   // WebSocket подключение
   useEffect(() => {
@@ -124,6 +131,7 @@ const Messages = () => {
       }
       
       setSelectedChat(newChat);
+      navigate(`/messages/${newChat.chat_id}`);
       setShowSearch(false);
       setSearchQuery('');
       setSearchResults([]);
@@ -178,23 +186,18 @@ const Messages = () => {
         {selectedChat ? (
           <>
             {/* Заголовок чата */}
-            <div className="flex items-center p-4 border-b border-gray-200 bg-white shadow-sm">
+            <div className="sticky top-0 z-10 flex items-center p-4 border-b border-gray-200 bg-white shadow-sm">
               <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
                 {selectedChat.second_user.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1">
                 <h2 className="font-semibold text-gray-900">{selectedChat.second_user}</h2>
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${wsConnected ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                  <span className="text-sm text-gray-500">
-                    {wsConnected ? 'В сети' : 'Не в сети'}
-                  </span>
-                </div>
+                
               </div>
             </div>
 
             {/* Область сообщений */}
-            <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+            <div className="flex-1 overflow-y-auto bg-gray-50">
               <div className="max-w-4xl mx-auto space-y-4">
                 {messages.map((message, index) => {
                   // Проверяем, является ли текущий пользователь автором сообщения
@@ -240,7 +243,7 @@ const Messages = () => {
             </div>
 
             {/* Поле ввода сообщения */}
-            <div className="p-4 border-t border-gray-200 bg-white">
+            <div className="p-4 border-t border-gray-200 bg-white z-40 md:z-auto fixed md:static bottom-14 left-0 right-0">
               <div className="max-w-4xl mx-auto flex gap-3 items-end">
                 <div className="flex-1 relative">
                   <textarea
@@ -283,7 +286,7 @@ const Messages = () => {
       {/* Правая панель - чаты */}
       <div className="w-80 border-l border-gray-200 bg-white flex flex-col">
         {/* Заголовок */}
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+        <div className="sticky top-0 z-10 p-4 border-b border-gray-200 flex justify-between items-center bg-white">
           <h2 className="text-lg font-semibold text-gray-900">Сообщения</h2>
           <button 
             className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors"
@@ -357,7 +360,7 @@ const Messages = () => {
                   className={`flex items-center p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
                     selectedChat?.chat_id === chat.chat_id ? 'bg-blue-50 border-r-2 border-blue-600' : ''
                   }`}
-                  onClick={() => setSelectedChat(chat)}
+                  onClick={() => { setSelectedChat(chat); navigate(`/messages/${chat.chat_id}`); }}
                 >
                   <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
                     {chat.second_user.charAt(0).toUpperCase()}

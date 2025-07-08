@@ -45,6 +45,7 @@ function App() {
             <Route path="/friends" element={<Friends />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/messages" element={<Messages />} />
+            <Route path="/messages/:chat_id" element={<Messages />} />
             {/* Другие маршруты внутри MainLayout */}
           </Routes>
         </MainLayout>

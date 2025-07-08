@@ -46,9 +46,6 @@ export default function Sidebar() {
     };
 
     loadUnreadCount();
-    // Обновляем каждые 30 секунд
-    const interval = setInterval(loadUnreadCount, 30000);
-    return () => clearInterval(interval);
   }, [user]);
 
   return (

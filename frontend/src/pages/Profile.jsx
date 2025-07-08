@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { profilesApi } from '../api';
 import { postsApi } from '../api';
 import { AuthContext } from '../context/AuthContext';
@@ -7,6 +7,7 @@ import PostModal from '../components/PostModal';
 import SubscriptionsModal from '../components/SubscriptionsModal';
 import * as subscriptionsApi from '../api/endpoints/subscriptions';
 import * as friendshipsApi from '../api/endpoints/friendships';
+import { createChat } from '../api/endpoints/chats';
 
 export default function Profile() {
   const { username } = useParams();
@@ -25,6 +26,8 @@ export default function Profile() {
   const [subscribersModalOpen, setSubscribersModalOpen] = useState(false);
   const [subscriptionsModalType, setSubscriptionsModalType] = useState('subscriptions');
   const [imageLoading, setImageLoading] = useState({});
+  const navigate = useNavigate();
+  const [chatLoading, setChatLoading] = useState(false);
 
   const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
@@ -134,6 +137,19 @@ export default function Profile() {
     }
   };
 
+  const handleWrite = async () => {
+    setChatLoading(true);
+    try {
+      const response = await createChat(username);
+      const chat = response.data;
+      navigate(`/messages/${chat.chat_id}`);
+    } catch (e) {
+      alert('Ошибка при создании чата');
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   if (loading) return <div className="flex justify-center items-center min-h-screen">Загрузка...</div>;
   if (error) return <div className="flex justify-center items-center min-h-screen text-red-500">{error}</div>;
   if (!profile) return null;
@@ -203,6 +219,13 @@ export default function Profile() {
                   className={`ml-0 md:ml-4 mt-2 md:mt-0 px-4 py-2 rounded font-bold transition-colors ${subscribed ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
                 >
                   {subscribed ? 'Отписаться' : 'Подписаться'}
+                </button>
+                <button
+                  onClick={handleWrite}
+                  disabled={chatLoading}
+                  className="ml-4 mt-2 md:mt-0 px-4 py-2 rounded font-bold bg-green-500 text-white hover:bg-green-600 transition-colors"
+                >
+                  {chatLoading ? '...' : 'Написать'}
                 </button>
                 {/* Кнопки дружбы */}
                 {profile.is_friend ? (
