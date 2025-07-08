@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from accounts.models import CustomUser
+from profiles.models import Profile
 
 
 class Command(BaseCommand):
@@ -30,6 +31,7 @@ class Command(BaseCommand):
             # Устанавливаем email_verified=True
             user.email_verified = True
             user.save()
+            Profile.objects.create(user=user)
 
             created_count += 1
             self.stdout.write(
