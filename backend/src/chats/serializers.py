@@ -12,7 +12,15 @@ class ChatSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField()
 
     def get_last_message(self, obj):
-        return obj.last_message.text if obj.last_message else None
+        if obj.last_message:
+            return {
+                "text": obj.last_message.text,
+                "author": obj.last_message.author.username
+                if obj.last_message.author
+                else None,
+                "created_at": obj.last_message.created_at,
+            }
+        return None
 
 
 class MessageSerializer(serializers.Serializer):

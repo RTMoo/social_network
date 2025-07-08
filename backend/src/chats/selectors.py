@@ -1,15 +1,21 @@
 from chats.models import Chat, Message
 from accounts.models import CustomUser
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 
 
 def get_user_chats(sender: CustomUser):
     chats = (
-        Chat.objects.filter(
-            Q(user1=sender) | Q(user2=sender),
-        )
+        Chat.objects.filter(Q(user1=sender) | Q(user2=sender))
         .select_related("user1", "user2")
-        .prefetch_related("messages")
+        .prefetch_related(
+            Prefetch(
+                "messages",
+                queryset=Message.objects.select_related("author").order_by(
+                    "-created_at"
+                )[:1],
+                to_attr="last_message_list",
+            )
+        )
     )
 
     for chat in chats:
@@ -18,7 +24,9 @@ def get_user_chats(sender: CustomUser):
         else:
             chat.second_user = chat.user1
 
-        chat.last_message = chat.messages.last()
+        chat.last_message = (
+            chat.last_message_list[-1] if chat.last_message_list else None
+        )
 
     return chats
 
