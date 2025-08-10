@@ -17,7 +17,7 @@ services:
     depends_on:
       - redis
       - elasticsearch
-    command: ["uv", "run", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: ["/src/entrypoint.sh"]
     networks:
       - app_net
 

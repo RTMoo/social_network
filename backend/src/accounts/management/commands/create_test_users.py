@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand
 from accounts.models import CustomUser
+from accounts.selectors import get_user
 from profiles.models import Profile
+from django.db import IntegrityError
 
 
 class Command(BaseCommand):
@@ -14,24 +16,20 @@ class Command(BaseCommand):
             email = f"user{i}@a.com"
             password = "admin"
 
-            # Проверяем, существует ли пользователь
-            if CustomUser.objects.filter(username=username).exists():
-                self.stdout.write(
-                    self.style.WARNING(
-                        f"Пользователь {username} уже существует, пропускаем"
-                    )
-                )
-                continue
-
             # Создаем пользователя
-            user = CustomUser.objects.create_user(
-                username=username, email=email, password=password
-            )
+
+            try:
+                user = CustomUser.objects.create_user(
+                    username=username, email=email, password=password
+                )
+            except IntegrityError:
+                user = get_user(username=username)
 
             # Устанавливаем email_verified=True
             user.email_verified = True
             user.save()
-            Profile.objects.create(user=user)
+
+            Profile.objects.get_or_create(user=user)
 
             created_count += 1
             self.stdout.write(

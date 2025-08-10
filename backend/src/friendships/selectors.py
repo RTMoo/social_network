@@ -80,7 +80,7 @@ def get_friendship_request_between(
     ).first()
 
 
-def get_user_friendships(
+def get_user_friendships_profiles(
     username: str,
 ) -> List[Profile]:
     """
@@ -107,9 +107,9 @@ def get_user_friendships(
     return profiles
 
 
-def get_sent_friendship_requests(
+def get_sent_friendship_requests_profiles(
     sender: CustomUser,
-) -> List[FriendshipRequest]:
+) -> List[Profile]:
     """
     Возвращает запросы на дружбу отправленные пользователем.
 
@@ -117,18 +117,18 @@ def get_sent_friendship_requests(
         sender (CustomUser): Пользователь, отправивший запросы.
 
     Returns:
-        List[FriendshipRequest]: Запросы на дружбу.
+        List[Profile]: Запросы на дружбу.
     """
+
     requests = FriendshipRequest.objects.filter(from_user=sender).select_related(
         "to_user__profile",
     )
-
+    
     return [request.to_user.profile for request in requests]
 
-
-def get_received_friendship_requests(
+def get_received_friendship_requests_profiles(
     recipient: CustomUser,
-) -> QuerySet[FriendshipRequest]:
+) -> List[Profile]:
     """
     Возвращает запросы на дружбу полученные пользователем.
 
@@ -136,13 +136,14 @@ def get_received_friendship_requests(
         recipient (CustomUser): Пользователь, получивший запросы.
 
     Returns:
-        QuerySet[FriendshipRequest]: Запросы на дружбу.
+        List[Profile]: Запросы на дружбу.
     """
-    return FriendshipRequest.objects.filter(to_user=recipient).select_related(
-        "from_user",
-        "to_user",
+    
+    requests = FriendshipRequest.objects.filter(to_user=recipient).select_related(
+        "from_user__profile",
     )
 
+    return [request.from_user.profile for request in requests]
 
 def get_friendship(
     user1: CustomUser,

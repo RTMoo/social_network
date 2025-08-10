@@ -7,7 +7,6 @@ from rest_framework import serializers
 from drf_spectacular.utils import extend_schema
 from friendships import services
 from friendships import selectors
-from friendships.serializers import FriendshipRequestSerializer
 from profiles.serializers import ProfileSerializer
 
 
@@ -17,23 +16,18 @@ class FriendshipRequestSendView(APIView):
     """
 
     permission_classes = [IsAuthenticated]
-    seralizer_class = FriendshipRequestSerializer
 
     @extend_schema(
-        request=None,
-        responses=FriendshipRequestSerializer,
         summary="Отправить запрос на дружбу",
         description="Отправляет запрос на дружбу пользователю с указанным username.",
     )
     def post(self, request: Request, username: str):
-        created_data = services.send_friendship_request(
+        services.send_friendship_request(
             current_user=request.user,
             username=username,
         )
 
-        data = FriendshipRequestSerializer(instance=created_data).data
-
-        return Response(data=data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)
 
 
 class FriendshipRequestAcceptView(APIView):
@@ -76,7 +70,6 @@ class FriendshipRequestRejectView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        request=None,
         responses={status.HTTP_204_NO_CONTENT: None},
         summary="Отклонить запрос на дружбу",
         description="Отклоняет запрос на дружбу от пользователя с указанным username.",
@@ -97,13 +90,12 @@ class FriendshipListView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        request=None,
         responses=ProfileSerializer,
         summary="Получить список друзей",
         description="Возвращает список друзей.",
     )
     def get(self, request: Request, username: str):
-        friendships = selectors.get_user_friendships(username=username)
+        friendships = selectors.get_user_friendships_profiles(username=username)
         data = ProfileSerializer(instance=friendships, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)
@@ -115,16 +107,16 @@ class FriendshipSentRequestListView(APIView):
     """
 
     permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
 
     @extend_schema(
-        request=None,
         responses=ProfileSerializer,
         summary="Список запросов на дружбу от текущего пользователя",
         description="Получить список запросов на дружбу отправленных пользователем",
     )
     def get(self, request: Request):
-        friendships = selectors.get_sent_friendship_requests(sender=request.user)
-        data = ProfileSerializer(instance=friendships, many=True).data
+        friendships = selectors.get_sent_friendship_requests_profiles(sender=request.user)
+        data = self.serializer_class(instance=friendships, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)
 
@@ -135,15 +127,15 @@ class FriendshipReceivedRequestListView(APIView):
     """
 
     permission_classes = [IsAuthenticated]
-    serializer_class = FriendshipRequestSerializer
+    serializer_class = ProfileSerializer
 
     @extend_schema(
-        responses=FriendshipRequestSerializer,
+        responses=ProfileSerializer,
         summary="Список запросов на дружбу полученных текущим пользователем",
         description="Получить список запросов на дружбу полученных пользователем",
     )
     def get(self, request: Request):
-        friendships = selectors.get_received_friendship_requests(recipient=request.user)
+        friendships = selectors.get_received_friendship_requests_profiles(recipient=request.user)
         data = self.serializer_class(instance=friendships, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)
@@ -157,7 +149,6 @@ class FriendshipDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        request=None,
         responses={status.HTTP_204_NO_CONTENT: None},
         summary="Удалить дружбу",
         description="Удаляет дружбу.",
