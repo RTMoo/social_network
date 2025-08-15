@@ -9,7 +9,7 @@ RUN uv venv /opt/venv
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-COPY ../pyproject.toml ../uv.lock /src/
+COPY ../pyproject.toml /src/
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=../pyproject.toml,target=/src/pyproject.toml \
