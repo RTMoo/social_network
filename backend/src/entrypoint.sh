@@ -1,16 +1,14 @@
 #!/bin/sh
 set -e
 
-# Ждём, пока Elasticsearch поднимется
-echo "⏳ Waiting for Elasticsearch..."
-until curl -s http://elasticsearch:9200 >/dev/null; do
-  sleep 2
-done
+echo "📦 Running migrations..."
+uv run manage.py migrate --noinput
 
-# Создаём индексы Elasticsearch
-echo "⚡ Creating Elasticsearch indexes..."
+echo "🎨 Collecting static files..."
+uv run manage.py collectstatic --noinput
+
+echo "🔍 Rebuilding Elasticsearch indexes..."
 yes y | uv run manage.py search_index --rebuild
 
-# Запускаем сервер Django
-echo "🚀 Starting Django server..."
-exec uv run manage.py runserver 0.0.0.0:8000
+echo "🚀 Starting Daphne..."
+exec uv run daphne -b 0.0.0.0 -p 8000 config.asgi:application
