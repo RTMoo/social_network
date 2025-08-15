@@ -2,9 +2,9 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: ./src/Dockerfile
+      dockerfile: Dockerfile
     env_file:
-      - backend/.env
+      - .env
     volumes:
       - ./backend/src:/src
       - ./backend/pyproject.toml:/pyproject.toml
@@ -15,8 +15,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - redis
-      - elasticsearch
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     command: ["/src/entrypoint.sh"]
     networks:
       - app_net
@@ -24,10 +26,10 @@ services:
   celery:
     build:
       context: ./backend
-      dockerfile: ./src/Dockerfile
+      dockerfile: Dockerfile
     command: ["uv", "run", "celery", "-A", "config", "worker", "--loglevel=info"]
     env_file:
-      - backend/.env
+      - .env
     volumes:
       - ./backend/src:/src
       - ./backend/pyproject.toml:/pyproject.toml
@@ -36,22 +38,30 @@ services:
       - REDIS_HOST=redis
       - PYTHONUNBUFFERED=1
     depends_on:
-      - backend
-      - redis
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
     networks:
       - app_net
 
   redis:
-    image: redis:alpine
+    image: redis:7
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
       - app_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.12
+    image: elasticsearch:7.17.12
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -68,6 +78,12 @@ services:
         hard: -1
     networks:
       - app_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
 
   frontend:
     build:

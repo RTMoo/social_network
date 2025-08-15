@@ -123,8 +123,9 @@ def get_sent_friendship_requests_profiles(
     requests = FriendshipRequest.objects.filter(from_user=sender).select_related(
         "to_user__profile",
     )
-    
+
     return [request.to_user.profile for request in requests]
+
 
 def get_received_friendship_requests_profiles(
     recipient: CustomUser,
@@ -138,12 +139,13 @@ def get_received_friendship_requests_profiles(
     Returns:
         List[Profile]: Запросы на дружбу.
     """
-    
+
     requests = FriendshipRequest.objects.filter(to_user=recipient).select_related(
         "from_user__profile",
     )
 
     return [request.from_user.profile for request in requests]
+
 
 def get_friendship(
     user1: CustomUser,

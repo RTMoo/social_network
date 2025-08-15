@@ -115,7 +115,9 @@ class FriendshipSentRequestListView(APIView):
         description="Получить список запросов на дружбу отправленных пользователем",
     )
     def get(self, request: Request):
-        friendships = selectors.get_sent_friendship_requests_profiles(sender=request.user)
+        friendships = selectors.get_sent_friendship_requests_profiles(
+            sender=request.user
+        )
         data = self.serializer_class(instance=friendships, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)
@@ -135,7 +137,9 @@ class FriendshipReceivedRequestListView(APIView):
         description="Получить список запросов на дружбу полученных пользователем",
     )
     def get(self, request: Request):
-        friendships = selectors.get_received_friendship_requests_profiles(recipient=request.user)
+        friendships = selectors.get_received_friendship_requests_profiles(
+            recipient=request.user
+        )
         data = self.serializer_class(instance=friendships, many=True).data
 
         return Response(data=data, status=status.HTTP_200_OK)

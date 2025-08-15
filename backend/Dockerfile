@@ -1,5 +1,4 @@
 FROM ghcr.io/astral-sh/uv:python3.11-alpine
-RUN apk add --no-cache curl
 
 WORKDIR /src
 
@@ -17,3 +16,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --no-dev
 
 COPY src /src
+EXPOSE 8000

@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "0").lower() in ("1", "true", "yes")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -86,12 +86,24 @@ TEMPLATES = [
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if not DEBUG:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB", "mydb"),
+            "USER": os.getenv("POSTGRES_USER", "myuser"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD", "mypassword"),
+            "HOST": "postgres",
+            "PORT": 5432,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Internationalization
@@ -150,6 +162,9 @@ CORS_ALLOW_CREDENTIALS = True  # Разрешает передавать кук�
 # Только для локального
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Redis
 CACHES = {
