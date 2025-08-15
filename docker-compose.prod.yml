@@ -9,7 +9,6 @@ services:
     volumes:
       - ./backend/src:/src
       - ./backend/pyproject.toml:/pyproject.toml
-      - ./backend/uv.lock:/uv.lock
     environment:
       - REDIS_HOST=redis
       - PYTHONUNBUFFERED=1
@@ -37,7 +36,6 @@ services:
     volumes:
       - ./backend/src:/src
       - ./backend/pyproject.toml:/pyproject.toml
-      - ./backend/uv.lock:/uv.lock
     environment:
       - REDIS_HOST=redis
       - PYTHONUNBUFFERED=1
