@@ -1,13 +1,20 @@
 import axios from 'axios';
 
 // Базовый URL API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
+const API_BASE_URL = "http://94.131.82.187/api/"
 
 // Создаём инстанс axios
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true, // для передачи cookie
 });
+
+// Публичные эндпоинты, для которых не делаем refresh или редирект
+const PUBLIC_ENDPOINTS = [
+  '/accounts/register/',
+  '/accounts/login/',
+  '/accounts/confirm_code/',
+];
 
 // Флаг, чтобы не делать несколько refresh одновременно
 let isRefreshing = false;
@@ -28,14 +35,22 @@ api.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config;
+
+    // Игнорируем публичные эндпоинты
+    if (PUBLIC_ENDPOINTS.some(url => originalRequest.url.endsWith(url))) {
+      return Promise.reject(error);
+    }
+
+    // Обработка 401 для защищённых эндпоинтов
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then(() => api(originalRequest))
           .catch(err => Promise.reject(err));
       }
+
       originalRequest._retry = true;
       isRefreshing = true;
       try {
@@ -50,6 +65,7 @@ api.interceptors.response.use(
         isRefreshing = false;
       }
     }
+
     return Promise.reject(error);
   }
 );
