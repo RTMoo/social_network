@@ -10,7 +10,7 @@ export default function Home() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
+  const backendUrl = "http://94.131.82.187" ;
 
   useEffect(() => {
     async function fetchPosts() {
