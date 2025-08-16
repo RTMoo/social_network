@@ -154,8 +154,8 @@ SIMPLE_JWT = {
 
 # CORS
 CORS_ALLOWED_ORIGINS = [
-	"http://localhost:3000",
-	"http://94.131.82.187:3000",
+	"http://94.131.82.187",
+    "http://localhost",
 ]
 CORS_ALLOW_METHODS = ["GET", "POST", "PATCH", "DELETE"]
 CORS_ALLOW_HEADERS = ["Authorization", "Content-Type"]

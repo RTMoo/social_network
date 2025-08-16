@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { getChats, createChat, getChatMessages } from '../api/endpoints/chats';
 import { searchProfiles } from '../api/endpoints/search';
 import { useParams, useNavigate } from 'react-router-dom';
+import { backendUrl } from '../constants';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -59,7 +60,7 @@ const Messages = () => {
         ws.close();
       }
 
-      const wsUrl = `ws://localhost:8000/ws/chat/${selectedChat.chat_id}/`;
+      const wsUrl = `ws://${backendUrl}/ws/chat/${selectedChat.chat_id}/`;
       const websocket = new WebSocket(wsUrl);
 
       websocket.onopen = () => {

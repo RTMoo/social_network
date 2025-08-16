@@ -1,1 +1,2 @@
-export const backendUrl = 'http://94.131.82.187/';
+export const backendUrl = 'http://localhost/';
+export const API_BASE_URL = "http://localhost/api/"

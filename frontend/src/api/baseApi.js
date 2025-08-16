@@ -1,7 +1,5 @@
 import axios from 'axios';
-
-// Базовый URL API
-const API_BASE_URL = "http://94.131.82.187/api/"
+import { API_BASE_URL } from '../constants';
 
 // Создаём инстанс axios
 const api = axios.create({
