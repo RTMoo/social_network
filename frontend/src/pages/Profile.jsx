@@ -8,6 +8,7 @@ import SubscriptionsModal from '../components/SubscriptionsModal';
 import * as subscriptionsApi from '../api/endpoints/subscriptions';
 import * as friendshipsApi from '../api/endpoints/friendships';
 import { createChat } from '../api/endpoints/chats';
+import { backendUrl } from '../constants';
 
 export default function Profile() {
   const { username } = useParams();
@@ -29,7 +30,6 @@ export default function Profile() {
   const navigate = useNavigate();
   const [chatLoading, setChatLoading] = useState(false);
 
-  const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
   useEffect(() => {
     async function fetchProfile() {
@@ -321,7 +321,6 @@ export default function Profile() {
         post={selectedPost}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        backendUrl={backendUrl}
         setPosts={setPosts}
         posts={posts}
       />
@@ -332,7 +331,6 @@ export default function Profile() {
         onClose={handleCloseSubscriptionsModal}
         username={username}
         type="subscriptions"
-        backendUrl={backendUrl}
         currentUser={user}
         onSubscriptionChange={handleSubscriptionChange}
       />
@@ -343,7 +341,6 @@ export default function Profile() {
         onClose={handleCloseSubscribersModal}
         username={username}
         type="subscribers"
-        backendUrl={backendUrl}
         currentUser={user}
         onSubscriptionChange={handleSubscriptionChange}
       />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as friendshipsApi from '../api/endpoints/friendships';
+import { backendUrl } from '../constants';
 
 export default function FriendsBlock({ user }) {
   const [tab, setTab] = useState('friends');
@@ -10,7 +11,6 @@ export default function FriendsBlock({ user }) {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState({});
   const [error, setError] = useState('');
-  const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
   useEffect(() => {
     fetchFriends();

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import EditProfileForm from '../features/profile/EditProfileForm';
 import { AuthContext } from '../context/AuthContext';
 import { profilesApi } from '../api';
+import { backendUrl } from '../constants';
 
 export default function EditProfilePage() {
   const { username } = useParams();
@@ -12,8 +13,6 @@ export default function EditProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(null);
-
-  const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
   useEffect(() => {
     async function fetchProfile() {

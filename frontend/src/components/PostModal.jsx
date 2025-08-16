@@ -4,8 +4,9 @@ import { commentsApi, postsApi, likesApi } from '../api';
 import CommentList from './CommentList';
 import CommentForm from './CommentForm';
 import { useForm } from 'react-hook-form';
+import { backendUrl } from '../constants';
 
-export default function PostModal({ post, isOpen, onClose, backendUrl, setPosts, posts }) {
+export default function PostModal({ post, isOpen, onClose, setPosts, posts }) {
   const { user } = useContext(AuthContext);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);

@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { postsApi } from '../api';
 import PostModal from '../components/PostModal';
+import { backendUrl } from '../constants';
 
 export default function Home() {
   const { user } = useContext(AuthContext);
@@ -9,8 +10,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const backendUrl = "http://94.131.82.187" ;
 
   useEffect(() => {
     async function fetchPosts() {
@@ -78,7 +77,6 @@ export default function Home() {
         post={selectedPost}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        backendUrl={backendUrl}
         setPosts={setPosts}
         posts={posts}
       />

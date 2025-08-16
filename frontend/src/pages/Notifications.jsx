@@ -10,7 +10,6 @@ const Notifications = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-  const backendUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api/', '') : 'http://localhost:8000';
 
   useEffect(() => {
     loadNotifications();
@@ -261,7 +260,6 @@ const Notifications = () => {
         post={selectedPost}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        backendUrl={backendUrl}
       />
     </div>
   );

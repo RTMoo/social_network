@@ -7,7 +7,6 @@ export default function SubscriptionsModal({
   onClose, 
   username, 
   type, // 'subscriptions' или 'subscribers'
-  backendUrl,
   currentUser, // добавляем текущего пользователя для проверки прав
   onSubscriptionChange // callback для уведомления об изменениях
 }) {
