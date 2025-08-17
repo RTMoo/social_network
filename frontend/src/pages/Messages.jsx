@@ -4,6 +4,7 @@ import { getChats, getChatMessages } from '../api/endpoints/chats';
 import { useParams, useNavigate } from 'react-router-dom';
 import { backendUrl } from '../constants';
 import { HiArrowLeft } from 'react-icons/hi';
+import { ipUrl } from '../constants';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -50,8 +51,12 @@ const Messages = () => {
   // WebSocket
   useEffect(() => {
     if (selectedChat) {
-      if (ws) ws.close();
-      const wsUrl = `ws://${backendUrl}/ws/chat/${selectedChat.chat_id}/`;
+      // Закрываем предыдущее подключение
+      if (ws) {
+        ws.close();
+      }
+
+      const wsUrl = `ws://${ipUrl}/ws/chat/${selectedChat.chat_id}/`;
       const websocket = new WebSocket(wsUrl);
 
       websocket.onopen = () => setWsConnected(true);
