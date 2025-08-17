@@ -2,15 +2,17 @@ import { useContext, useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { getNotifications } from '../api';
+import { HiHome, HiSearch, HiChat, HiBell, HiPlus, HiUser, HiUsers, HiLogout } from 'react-icons/hi';
 
-// Иконки (простые SVG для примера)
-const HomeIcon = () => <span>🏠</span>;
-const SearchIcon = () => <span>🔍</span>;
-const MessagesIcon = () => <span>💬</span>;
-const NotificationsIcon = () => <span>🔔</span>;
-const CreateIcon = () => <span>➕</span>;
-const ProfileIcon = () => <span>👤</span>;
-const FriendsIcon = () => <span>👥</span>;
+
+const HomeIcon = ({ className='', size=24}) => <HiHome className={`text-black ${className}`} size={size}/>;
+const SearchIcon = ({ className='', size=24}) => <HiSearch className={`text-black ${className}`} size={size}/>;
+const MessagesIcon = ({ className='', size=24}) => <HiChat className={`text-black ${className}`} size={size}/>;
+const NotificationsIcon = ({ className='', size=24}) => <HiBell className={`text-black ${className}`} size={size}/>;
+const CreateIcon = ({ className='', size=24}) => <HiPlus className={`text-black ${className}`} size={size}/>;
+const ProfileIcon = ({ className='', size=24}) => <HiUser className={`text-black ${className}`} size={size}/>;
+const FriendsIcon = ({ className='', size=24}) => <HiUsers className={`text-black ${className}`} size={size}/>;
+const LogoutIcon = ({ className='', size=24}) => <HiLogout className={`text-red-600 ${className}`} size={size}/>
 
 export default function Sidebar() {
   const { user, logout } = useContext(AuthContext);
@@ -55,20 +57,20 @@ export default function Sidebar() {
         <div className="text-2xl font-bold mb-8">SocialNet</div>
         <nav className="flex flex-col gap-2">
           <NavLink to="/" className={navLinkClasses}>
-            <HomeIcon />
+            <HomeIcon size={30}/>
             Главная
           </NavLink>
           <NavLink to="/search" className={navLinkClasses}>
-            <SearchIcon />
+            <SearchIcon size={30}/>
             Поиск
           </NavLink>
           <NavLink to="/messages" className={navLinkClasses}>
-            <MessagesIcon />
+            <MessagesIcon size={30}/>
             Сообщения
           </NavLink>
           <NavLink to="/notifications" className={navLinkClasses}>
             <div className="flex items-center gap-4 relative">
-              <NotificationsIcon />
+              <NotificationsIcon size={30}/>
               <span>Уведомления</span>
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -78,18 +80,18 @@ export default function Sidebar() {
             </div>
           </NavLink>
           <NavLink to="/create" className={navLinkClasses}>
-            <CreateIcon />
+            <CreateIcon size={30}/>
             Создать
           </NavLink>
           {user && (
             <NavLink to={`/profile/${user.username}`} className={navLinkClasses}>
-              <ProfileIcon />
+              <ProfileIcon size={30}/>
               Профиль
             </NavLink>
           )}
           {user && (
             <NavLink to="/friends" className={navLinkClasses}>
-              <FriendsIcon />
+              <FriendsIcon size={30}/>
               Друзья
             </NavLink>
           )}
@@ -99,7 +101,7 @@ export default function Sidebar() {
             onClick={handleLogout}
             className="w-full flex items-center gap-3 p-3 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 font-semibold transition-colors duration-200"
           >
-            Выйти
+            <LogoutIcon size={30}/>
           </button>
         </div>
       </aside>
@@ -109,17 +111,17 @@ export default function Sidebar() {
         <div className="text-xl font-bold mb-8 text-center">SN</div>
         <nav className="flex flex-col gap-2">
           <NavLink to="/" className={navLinkClasses}>
-            <HomeIcon />
+            <HomeIcon size={27}/>
           </NavLink>
           <NavLink to="/search" className={navLinkClasses}>
-            <SearchIcon />
+            <SearchIcon size={27}/>
           </NavLink>
           <NavLink to="/messages" className={navLinkClasses}>
-            <MessagesIcon />
+            <MessagesIcon size={27}/>
           </NavLink>
           <NavLink to="/notifications" className={navLinkClasses}>
             <div className="relative">
-              <NotificationsIcon />
+              <NotificationsIcon size={27}/>
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                   {unreadCount > 9 ? '9+' : unreadCount}
@@ -128,11 +130,16 @@ export default function Sidebar() {
             </div>
           </NavLink>
           <NavLink to="/create" className={navLinkClasses}>
-            <CreateIcon />
+            <CreateIcon size={27}/>
           </NavLink>
           {user && (
             <NavLink to={`/profile/${user.username}`} className={navLinkClasses}>
-              <ProfileIcon />
+              <ProfileIcon size={27}/>
+            </NavLink>
+          )}
+          {user && (
+            <NavLink to="/friends" className={navLinkClasses}>
+              <FriendsIcon size={27}/>
             </NavLink>
           )}
         </nav>
@@ -142,7 +149,7 @@ export default function Sidebar() {
             className="w-full flex items-center justify-center p-3 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors duration-200"
             title="Выйти"
           >
-            🚪
+            <LogoutIcon size={27}/>
           </button>
         </div>
       </aside>
@@ -158,10 +165,6 @@ export default function Sidebar() {
             <SearchIcon />
             <span className="text-xs">Поиск</span>
           </NavLink>
-          <NavLink to="/create" className={mobileNavLinkClasses}>
-            <CreateIcon />
-            <span className="text-xs">Создать</span>
-          </NavLink>
           <NavLink to="/notifications" className={mobileNavLinkClasses}>
             <div className="relative">
               <NotificationsIcon />
@@ -173,10 +176,27 @@ export default function Sidebar() {
             </div>
             <span className="text-xs">Уведомления</span>
           </NavLink>
+          <NavLink to="/create" className={mobileNavLinkClasses}>
+            <CreateIcon />
+            <span className="text-xs">Создать</span>
+          </NavLink>
+          
           {user && (
             <NavLink to={`/profile/${user.username}`} className={mobileNavLinkClasses}>
               <ProfileIcon />
               <span className="text-xs">Профиль</span>
+            </NavLink>
+          )}
+          {user && (
+            <NavLink to="/friends" className={mobileNavLinkClasses}>
+              <FriendsIcon />
+              <span className="text-xs">Друзья</span>
+            </NavLink>
+          )}
+          {user && (
+            <NavLink to="/messages" className={mobileNavLinkClasses}>
+              <MessagesIcon />
+              <span className="text-xs">Сообщения</span>
             </NavLink>
           )}
         </div>
