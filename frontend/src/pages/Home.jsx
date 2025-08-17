@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { postsApi } from '../api';
 import PostModal from '../components/PostModal';
 import { backendUrl } from '../constants';
+import { HiOutlineCamera } from 'react-icons/hi';
 
 export default function Home() {
   const { user } = useContext(AuthContext);
@@ -60,7 +61,7 @@ export default function Home() {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-6xl text-gray-300">📷</span>
+                    <HiOutlineCamera className="text-gray-300 w-16 h-16" />
                   </div>
                 )}
               </div>
@@ -68,7 +69,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
-            <span className="text-4xl mb-4 block">📷</span>
+            <HiOutlineCamera className="mx-auto mb-4 w-16 h-16 text-gray-300" />
             <p>Пока нет публикаций</p>
           </div>
         )}
@@ -82,4 +83,4 @@ export default function Home() {
       />
     </div>
   );
-} 
+}
