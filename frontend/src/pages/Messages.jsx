@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getChats, getChatMessages } from '../api/endpoints/chats';
 import { useParams, useNavigate } from 'react-router-dom';
-import { HiArrowLeft } from 'react-icons/hi';
+import { HiArrowLeft, HiHome } from 'react-icons/hi';
 import { ipUrl } from '../constants';
 
 const Messages = () => {
@@ -115,17 +115,26 @@ const Messages = () => {
   // ======= Рендер ==========
   return (
     <div className="flex flex-col h-screen bg-gray-100">
-
       <div className="flex flex-1">
-        {/* --- Список чатов --- */}
+        {/* ---------- Список чатов (левая колонка) ---------- */}
         <div className={`
           bg-white border-r border-gray-200
           ${mobileView === 'chat' ? 'hidden md:block' : 'block'}
-          w-full sm:w-full md:w-56 lg:w-64 flex-shrink-0 flex flex-col
+          w-full sm:w-full md:w-56 lg:w-64 flex-shrink-0
+          flex flex-col
+          md:sticky md:top-0 md:h-screen md:overflow-y-auto
         `}>
-          <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white font-semibold text-lg">
-            Чаты
+          <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white font-semibold text-lg flex items-center justify-between">
+            <span>Чаты</span>
+            <button
+              className="text-gray-600 hover:text-gray-900"
+              onClick={handleGoHome}
+              aria-label="Домой"
+            >
+              <HiHome className="w-6 h-6" />
+            </button>
           </div>
+
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="p-4 text-center text-gray-500">Загрузка чатов...</div>
@@ -158,26 +167,29 @@ const Messages = () => {
           </div>
         </div>
 
-        {/* --- Сам чат --- */}
+        {/* ---------- Область чата (правая колонка) ---------- */}
         {selectedChat && (
           <div className={`
             flex-1 flex flex-col w-full bg-white
             ${mobileView === 'list' ? 'hidden md:flex' : 'flex'}
           `}>
             <div className="sticky top-0 z-10 flex items-center p-4 border-b border-gray-200 bg-white shadow-sm">
-              {/* Кнопка назад (только на мобиле, сверху) */}
+              {/* Назад (только мобилка) */}
               <button
                 className="md:hidden mr-3 text-gray-600 hover:text-gray-900"
                 onClick={handleBackToList}
+                aria-label="Назад к списку"
               >
                 <HiArrowLeft className="w-6 h-6" />
               </button>
+
               <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
                 {selectedChat.second_user.charAt(0).toUpperCase()}
               </div>
               <h2 className="font-semibold text-gray-900">{selectedChat.second_user}</h2>
             </div>
 
+            {/* Сообщения */}
             <div className="flex-1 overflow-y-auto bg-gray-50">
               <div className="max-w-4xl mx-auto space-y-4 p-4">
                 {messages.map((message, index) => {
@@ -213,6 +225,7 @@ const Messages = () => {
               </div>
             </div>
 
+            {/* Поле ввода */}
             <div className="p-4 border-t border-gray-200 bg-white fixed md:static bottom-0 left-0 right-0">
               <div className="max-w-4xl mx-auto flex gap-3 items-end">
                 <textarea
@@ -237,19 +250,6 @@ const Messages = () => {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Кнопка внизу (только для мобилы) */}
-      <div className="p-4 md:hidden bg-white">
-        {mobileView === 'list' ? (
-          <button
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-            onClick={handleGoHome}
-          >
-            <HiArrowLeft className="w-6 h-6" />
-            <span>Домой</span>
-          </button>
-        ):(<></>)}
       </div>
     </div>
   );

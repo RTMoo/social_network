@@ -9,10 +9,10 @@ export default function MainLayout({ children }) {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
-      {/* Сайдбар скрываем на /messages только на мобилках */}
-      <div className={`${isMessagesPage ? 'hidden md:block' : ''}`}>
+      {/* Сайдбар показываем только если мы НЕ на странице сообщений */}
+      {!isMessagesPage && (
         <Sidebar />
-      </div>
+      )}
 
       <main
         className={`flex-1 ${!isMessagesPage ? 'lg:ml-64 md:ml-16' : ''}`}

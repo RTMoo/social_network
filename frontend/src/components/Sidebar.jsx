@@ -61,7 +61,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Десктоп */}
-      <aside className="hidden lg:flex w-64 flex-shrink-0 border-r border-gray-200 bg-white h-screen sticky top-0 flex-col p-4">
+      <aside className="hidden lg:flex w-64 flex-shrink-0 border-r border-gray-200 bg-white h-screen fixed top-0 flex-col p-4">
         <div className="text-2xl font-bold mb-8">Romagram</div>
         <nav className="flex flex-col gap-2">
           <NavLink to="/" className={navLinkClasses}><HomeIcon size={30} />Главная</NavLink>
@@ -84,7 +84,7 @@ export default function Sidebar() {
       </aside>
 
       {/* Планшет */}
-      <aside className="hidden md:flex lg:hidden w-16 flex-shrink-0 border-r border-gray-200 bg-white h-screen sticky top-0 flex-col p-2">
+      <aside className="hidden md:flex lg:hidden w-16 flex-shrink-0 border-r border-gray-200 bg-white h-screen fixed top-0 flex-col p-2">
         <div className="text-xl font-bold mb-8 text-center">RM</div>
         <nav className="flex flex-col gap-2">
           <NavLink to="/" className={navLinkClasses}><HomeIcon size={27} /></NavLink>
