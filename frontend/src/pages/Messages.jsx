@@ -52,7 +52,7 @@ const Messages = () => {
     if (selectedChat) {
       if (ws) ws.close();
 
-      const wsUrl = `ws://${ipUrl}/ws/chat/${selectedChat.chat_id}/`;
+      const wsUrl = `wss://${ipUrl}/ws/chat/${selectedChat.chat_id}/`;
       const websocket = new WebSocket(wsUrl);
 
       websocket.onopen = () => setWsConnected(true);
