@@ -93,8 +93,8 @@ if not DEBUG:
             "NAME": os.getenv("POSTGRES_DB", "mydb"),
             "USER": os.getenv("POSTGRES_USER", "myuser"),
             "PASSWORD": os.getenv("POSTGRES_PASSWORD", "mypassword"),
-            "HOST": "postgres",
-            "PORT": 5432,
+            "HOST": os.getenv("POSTGRES_HOST", "postgres"),
+            "PORT": int(os.getenv("POSTGRES_PORT", 5432)),
         }
     }
 else:
@@ -147,24 +147,22 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "AUTH_COOKIE": "access_token",
-    "AUTH_COOKIE_SECURE": False,  # True для Production
+    "AUTH_COOKIE_SECURE": True,  # True для Production
     "AUTH_COOKIE_HTTP_ONLY": True,
     "AUTH_COOKIE_SAMESITE": "Lax",
 }
 
 # CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://94.131.82.187",
     "http://localhost",
-    "http://romagram.kz",
-    "http://www.romagram.kz",
+    "https://romagram.kz",
+    "https://www.romagram.kz",
 ]
 CORS_ALLOW_METHODS = ["GET", "POST", "PATCH", "DELETE"]
 CORS_ALLOW_HEADERS = ["Authorization", "Content-Type"]
-CORS_MAX_AGE = 600  # Кэшировать preflight на 10 минут
-CORS_ALLOW_CREDENTIALS = True  # Разрешает передавать куки и токены
+CORS_MAX_AGE = 600
+CORS_ALLOW_CREDENTIALS = True
 
-# Только для локального
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
@@ -187,6 +185,7 @@ CELERY_BROKER_URL = "redis://redis:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 
+# SMTP
 EMAIL_BACKENDS = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = os.getenv("EMAIL_PORT")
@@ -201,10 +200,11 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 # Elasticsearch
 ELASTICSEARCH_DSL = {
     "default": {
-        "hosts": os.getenv("ELASTICSEARCH_HOST", "http://elasticsearch:9200"),
+        "hosts": "http://elasticsearch:9200",
     },
 }
 
+# Django Channels
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
