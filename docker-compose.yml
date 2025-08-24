@@ -64,8 +64,6 @@ services:
   redis:
     image: redis:7
     container_name: redis
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -85,8 +83,6 @@ services:
       - network.host=0.0.0.0
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms256m -Xmx1024m"
-    ports:
-      - "9200:9200"
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ulimits:
